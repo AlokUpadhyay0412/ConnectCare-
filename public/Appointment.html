@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Appointments - EHR System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+  <style>
+    :root { --primary-blue: #2196F3; --dark-header: #1e293b; --light-bg: #f8fafc; --border-color: #e2e8f0; }
+    body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: var(--light-bg); }
+    header { background-color: var(--dark-header); color: #fff; position: sticky; top: 0; z-index: 100; }
+    .header-container { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; max-width: 1400px; margin: 0 auto; }
+    .logo { height: 80px; }
+    nav ul { display: flex; gap: 24px; list-style: none; margin: 0; }
+    nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; }
+    nav a.active { color: #fff; }
+    .profile-section { display: flex; align-items: center; gap: 12px; }
+    .profile-section h1 { font-size: 1.25rem; margin: 0; }
+    .main-container { padding: 32px; max-width: 1400px; margin: 0 auto; }
+    .page-header h2 { font-size: 2rem; margin: 0; }
+    #calendar-container { background-color: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); }
+    :root { --fc-border-color: var(--border-color); --fc-button-bg-color: var(--primary-blue); --fc-event-bg-color: var(--primary-blue); --fc-event-border-color: var(--primary-blue); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <img src="image/logo.png" alt="EHR Logo" class="logo">
+      <nav>
+        <ul>
+          <li><a href="doctorDashboard.html">Dashboard</a></li>
+          <li><a href="Appointment.html" class="active">Appointments</a></li>
+          <li><a href="DocPatientSection.html">Patients</a></li>
+          <li><a href="reports.html">Reports</a></li>
+        </ul>
+      </nav>
+      <div class="profile-section">
+        <h1>Dr. <span id="doctorName">—</span></h1>
+        <a href="doctorlogin.html" id="logoutBtn" style="color: #ef4444; margin-left: 16px;">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-header">
+      <h2>My Appointments</h2>
+    </div>
+    <div id="calendar-container">
+      <div id="calendar"></div>
+    </div>
+  </main>
+
+ <script>
+    // FIX 1: Use the consistent 'authToken' for authentication.
+    const authToken = localStorage.getItem('authToken');
+    const doctorName = localStorage.getItem('doctorName');
+
+    if (!authToken) {
+        alert('You must be logged in to view appointments.');
+        window.location.href = 'doctorlogin.html';
+    } else {
+        document.getElementById('doctorName').textContent = doctorName || '(Doctor)';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.clear();
+        // No need for preventDefault() if it's already a link to the login page.
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            
+            // FIX 2: Replace the simple URL string with a function to fetch events.
+            // This allows us to add the required secure Authorization header.
+            events: function(fetchInfo, successCallback, failureCallback) {
+                fetch('/api/doctor/appointments', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // FullCalendar expects events with 'title' and 'start' properties.
+                    // The server.js endpoint provides this format, so no mapping is needed.
+                    successCallback(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching appointments:', error);
+                    alert('Could not load appointment data.');
+                    failureCallback(error);
+                });
+            },
+
+            editable: false, // The doctor cannot drag/drop appointments
+            eventClick: function(info) {
+                // Provides a more readable date and time format
+                const eventTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const eventDate = info.event.start.toLocaleDateString();
+                alert(`Appointment with: ${info.event.title}\nDate: ${eventDate}\nTime: ${eventTime}`);
+            }
+        });
+        
+        calendar.render();
+    });
+</script>
+</body>
+</html>

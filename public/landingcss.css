@@ -1,0 +1,564 @@
+/* General Body & Font Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    scroll-behavior: smooth;
+}
+
+h1, h2, h3 {
+    color: #388E3C; /* A slightly darker green for headings */
+}
+
+/* Header & Navigation */
+header {
+    background: #4CAF50;
+    padding: 1rem 5%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    height: 50px; /* Adjusted for better fit */
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+header nav ul li a:hover {
+    opacity: 0.8;
+}
+
+/* General Button Styles */
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    border: none;
+    display: inline-block;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.login {
+    background-color: #ffffff;
+    color: #4CAF50;
+}
+.login:hover {
+    background-color: #f0f0f0;
+}
+
+/* Role Specific Button Colors */
+.doctor { 
+    background-color: #FF5722; /* Deep Orange */
+}
+.doctor:hover { 
+    background-color: #E64A19; 
+}
+
+.patient { 
+    background-color: #2196F3; /* Blue */
+}
+.patient:hover { 
+    background-color: #1976D2; 
+}
+
+.admin { 
+    background-color: #607D8B; /* Blue Grey */
+}
+.admin:hover { 
+    background-color: #455A64; 
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fGVocnxlbnwwfHx8fDE2NDA1MTgyMjQ&ixlib=rb-1.2.1&q=80&w=1080') no-repeat center center/cover;
+    color: white;
+    text-align: center;
+    padding: 120px 20px;
+}
+
+.hero-content h1 {
+    font-size: 3.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.hero-content p {
+    font-size: 1.3rem;
+    max-width: 700px;
+    margin: 0 auto 30px auto;
+}
+
+/* General Section Styling */
+section {
+    padding: 60px 5%;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #4CAF50;
+    margin-bottom: 40px;
+}
+
+/* About Section */
+.about {
+    background-color: #ffffff;
+}
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+.about-container p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* How-to-Use Sections (Key Features) */
+.how-to-section {
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+.how-to-section:last-of-type {
+    border-bottom: none;
+}
+.how-to-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.how-to-image, .how-to-text {
+    flex: 1;
+}
+
+.how-to-image img {
+    width: 100%; 
+    max-width: 500px;
+    height: auto; 
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.how-to-text h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #4CAF50;
+}
+.how-to-text i {
+    font-size: 2rem;
+    color: #4CAF50;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+/* Alternating Layout */
+.how-to-section.alternate .how-to-container {
+    flex-direction: row-reverse;
+}
+
+/* How It Works Section */
+.how-it-works {
+    background-color: #f5f7fa;
+}
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+}
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background-color: #4CAF50;
+    top: 30px; /* Adjusted to align with icons */
+    left: 0;
+    z-index: 1;
+}
+.timeline-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    padding: 0 10px;
+}
+.timeline-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    margin: 0 auto 15px auto;
+    border: 4px solid #f5f7fa;
+}
+.timeline-step h4 {
+    margin: 10px 0 5px 0;
+    color: #388E3C;
+}
+
+/* Reviews / Testimonials Section */
+.reviews {
+    background-color: #E8F5E9; /* Light green background */
+}
+.reviews-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.review-card {
+    background: #fff;
+    padding: 2rem;
+    border-left: 5px solid #4CAF50;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    flex: 1;
+    min-width: 300px;
+    max-width: 350px;
+}
+.review-card p {
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.reviewer-info img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+.reviewer-info span {
+    line-height: 1.3;
+}
+
+/* Contact Section */
+.contact {
+    background-color: #ffffff;
+}
+#contactForm {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+#contactForm input, #contactForm textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+#contactForm button {
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+#contactForm button:hover {
+    background-color: #45a049;
+}
+
+/* Footer */
+footer {
+    background-color: #388E3C;
+    color: #f0f0f0;
+    padding-top: 40px;
+}
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.footer-about, .footer-links, .footer-social {
+    flex: 1;
+    min-width: 250px;
+}
+footer h4 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-links ul li {
+    margin-bottom: 8px;
+}
+.footer-links ul li a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.footer-links ul li a:hover {
+    color: #ffffff;
+}
+.footer-social a {
+    color: #ccc;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    transition: color 0.3s;
+}
+.footer-social a:hover {
+    color: #ffffff;
+}
+.footer-bottom {
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #4CAF50;
+}
+/* Container Positioning */
+.aura-widget-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    z-index: 9999;
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    transition: transform 0.3s ease;
+}
+
+.aura-widget-container:hover {
+    transform: scale(1.02);
+}
+
+/* 1. Avatar Circle (Updated: Green & Wider Border) */
+.aura-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+
+    /* CHANGE IS HERE: Thicker (6px) and Green (#4CAF50) */
+    border: 6px solid #4CAF50;
+
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 2;
+}
+
+.aura-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* White Speech Bubble */
+.aura-bubble {
+    position: relative;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 220px;
+    margin-right: 20px; /* Gap between bubble and avatar */
+    display: flex;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* The Triangle Tail */
+.aura-bubble::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    transform: translateY(-50%);
+    border-width: 10px 0 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent #ffffff;
+}
+
+/* 2. Close 'X' Button (Updated: Matching Green) */
+.aura-close {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 22px;
+    height: 22px;
+
+    /* CHANGE IS HERE: Green background to match the border */
+    background-color: #4CAF50;
+
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-button:hover {
+    color: #333;
+}
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+.modal-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    padding: 12px;
+}
+
+/* Screen Reader Only Class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    header nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .how-to-container, .how-to-section.alternate .how-to-container {
+        flex-direction: column;
+    }
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+    .timeline {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .timeline::after {
+        width: 4px;
+        height: 100%;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+    }
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}

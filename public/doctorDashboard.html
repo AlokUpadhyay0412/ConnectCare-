@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - EHR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --bg-light: #f4f7f6;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --blue: #2196F3;
+            --orange: #FF9800;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            padding: 15px 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: var(--white);
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 0 0 50% 50% / 20px;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        /* Grid */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border-bottom: 5px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-bottom-color: var(--primary);
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background: #E8F5E9;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px;
+        }
+
+        .card.admitted .icon-box {
+            background: #E3F2FD;
+            color: var(--blue);
+        }
+
+        .card.admitted:hover {
+            border-bottom-color: var(--blue);
+        }
+
+        .card.appt .icon-box {
+            background: #FFF3E0;
+            color: var(--orange);
+        }
+
+        .card.appt:hover {
+            border-bottom-color: var(--orange);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 800px;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: var(--primary);
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Lists and Forms */
+        .patient-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .patient-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-action.discharge {
+            background: #d32f2f;
+        }
+
+        form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        form input,
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-top: 25px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo"><i class="fas fa-user-md fa-lg"></i> &nbsp; EHR Doctor</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <span>Dr. <strong id="doctorName">...</strong></span>
+            <button class="btn-logout" id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Medical Practice Dashboard</h1>
+        <p>Manage patients, appointments, and hospital admissions efficiently.</p>
+        <div
+            style="margin-top:20px; display:inline-block; background:rgba(255,255,255,0.2); padding:8px 16px; border-radius:20px;">
+            <i class="fas fa-clock"></i> Today: <span id="todayDate">Loading...</span>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="grid">
+            <div class="card admitted" id="card-admitted">
+                <div class="icon-box"><i class="fas fa-procedures"></i></div>
+                <h3>Admitted Patients</h3>
+                <p>View currently admitted patients & discharge.</p>
+            </div>
+
+            <div class="card appt" id="card-appt-list">
+                <div class="icon-box"><i class="fas fa-users"></i></div>
+                <h3>Patient List</h3>
+                <p>List of all patients with appointments.</p>
+            </div>
+
+            <div class="card" id="card-schedule">
+                <div class="icon-box"><i class="fas fa-calendar-day"></i></div>
+                <h3>Appointments</h3>
+                <p>Check your schedule for today.</p>
+            </div>
+
+            <div class="card" id="card-admit-new">
+                <div class="icon-box"><i class="fas fa-user-plus"></i></div>
+                <h3>Admit Patient</h3>
+                <p>Register a new patient to the system.</p>
+            </div>
+
+            <div class="card" id="card-reports">
+                <div class="icon-box"><i class="fas fa-file-medical-alt"></i></div>
+                <h3>Medical Reports</h3>
+                <p>Create and view patient reports.</p>
+            </div>
+
+            <div class="card" id="card-prescriptions">
+                <div class="icon-box"><i class="fas fa-prescription-bottle-alt"></i></div>
+                <h3>E-Prescribing</h3>
+                <p>Issue digital prescriptions.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="admittedModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏥 Admitted Patients</h2><span class="modal-close" data-target="admittedModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <ul id="admittedList" class="patient-list">Loading...</ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="appointmentPatientsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Patient History List</h2><span class="modal-close"
+                    data-target="appointmentPatientsModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <ul id="apptPatientList" class="patient-list">Loading...</ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🗓️ Appointment Schedule</h2><span class="modal-close" data-target="scheduleModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <ul id="scheduleList" class="patient-list">Loading...</ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="admitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Admit New Patient</h2><span class="modal-close" data-target="admitModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="admitForm">
+                    <label>Full Name</label><input type="text" name="name" required>
+                    <label>Email</label><input type="email" name="email" required>
+                    <label>Contact Number</label><input type="tel" name="contact">
+                    <label>Initial Diagnosis / Notes</label><textarea name="medical_history_summary"
+                        rows="3"></textarea>
+                    <button type="submit" class="submit-btn">Admit Patient</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUTH & CONFIG ---
+        const token = localStorage.getItem('authToken');
+        const docName = localStorage.getItem('doctorName');
+
+        // --- GLOBAL FUNCTION EXPORTS (For dynamic buttons) ---
+        window.dischargePatient = dischargePatient;
+        window.completeAppt = completeAppt;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("System Initializing...");
+
+            // 1. Auth Check
+            if (!token) {
+                alert("Please log in.");
+                window.location.href = 'doctorlogin.html';
+                return;
+            }
+
+            // 2. Set UI Data
+            document.getElementById('doctorName').textContent = docName || 'Doctor';
+            document.getElementById('todayDate').textContent = new Date().toLocaleDateString();
+
+            // 3. Attach Event Listeners to Cards
+
+            // Admitted Patients
+            document.getElementById('card-admitted').addEventListener('click', () => {
+                openModal('admittedModal');
+                loadCategorizedPatients();
+            });
+
+            // Patient List
+            document.getElementById('card-appt-list').addEventListener('click', () => {
+                openModal('appointmentPatientsModal');
+                loadCategorizedPatients();
+            });
+
+            // Schedule
+            document.getElementById('card-schedule').addEventListener('click', () => {
+                openModal('scheduleModal');
+                loadAppointments();
+            });
+
+            // Admit New
+            document.getElementById('card-admit-new').addEventListener('click', () => {
+                openModal('admitModal');
+            });
+
+            // --- FIXED: Reports Navigation ---
+            document.getElementById('card-reports').addEventListener('click', () => {
+                console.log("Navigating to Reports...");
+                window.location.href = 'reports.html';
+            });
+
+            // --- FIXED: E-Prescribing Navigation ---
+            document.getElementById('card-prescriptions').addEventListener('click', () => {
+                console.log("Navigating to E-Prescribing...");
+                window.location.href = 'E-Prescribing.html';
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+
+            // Close Modals (X buttons)
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.target;
+                    document.getElementById(targetId).style.display = 'none';
+                });
+            });
+
+            // Close Modals (Outside Click)
+            window.onclick = function (e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            };
+        });
+
+        // --- HELPER FUNCTIONS ---
+
+        function openModal(id) {
+            console.log("Opening Modal:", id);
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'flex';
+        }
+
+        // --- API FUNCTIONS ---
+
+        async function loadCategorizedPatients() {
+            try {
+                const res = await fetch('/api/doctor/patients-categorized', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) { console.error("API Error"); return; }
+                const data = await res.json();
+
+                // Render Admitted
+                const admittedList = document.getElementById('admittedList');
+                if (data.admitted && Array.isArray(data.admitted)) {
+                    admittedList.innerHTML = data.admitted.length ? '' : '<p style="text-align:center">No admitted patients.</p>';
+                    data.admitted.forEach(p => {
+                        admittedList.innerHTML += `
+                            <li class="patient-item">
+                                <div class="patient-info">
+                                    <h4>${p.name}</h4>
+                                    <p>Contact: ${p.contact_phone || '--'}</p>
+                                    <p><i>${p.medical_history_summary || 'No notes'}</i></p>
+                                </div>
+                                <button class="btn-action discharge" onclick="window.dischargePatient(${p.id})">Discharge</button>
+                            </li>`;
+                    });
+                }
+
+                // Render History
+                const apptList = document.getElementById('apptPatientList');
+                if (data.appointmentPatients && Array.isArray(data.appointmentPatients)) {
+                    apptList.innerHTML = data.appointmentPatients.length ? '' : '<p style="text-align:center">No records found.</p>';
+                    data.appointmentPatients.forEach(p => {
+                        apptList.innerHTML += `
+                            <li class="patient-item" style="border-left-color: #FF9800;">
+                                <div class="patient-info">
+                                    <h4>${p.name}</h4>
+                                    <p>Contact: ${p.contact_phone || '--'}</p>
+                                    <p>Last Visit: ${p.last_visit ? new Date(p.last_visit).toLocaleDateString() : 'N/A'}</p>
+                                </div>
+                                <button class="btn-action" onclick="alert('Coming Soon')">View Profile</button>
+                            </li>`;
+                    });
+                }
+            } catch (err) { console.error("Load Error:", err); }
+        }
+
+        async function loadAppointments() {
+            try {
+                const res = await fetch('/api/doctor/appointments', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const list = document.getElementById('scheduleList');
+                if (Array.isArray(data)) {
+                    list.innerHTML = data.length ? '' : '<p style="text-align:center">No appointments.</p>';
+                    data.forEach(appt => {
+                        const date = new Date(appt.start).toLocaleDateString();
+                        const time = new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        list.innerHTML += `
+                            <li class="patient-item">
+                                <div class="patient-info">
+                                    <h4>${appt.title}</h4>
+                                    <p>${date} at ${time}</p>
+                                    <p>Status: <strong>${appt.status || 'Scheduled'}</strong></p>
+                                </div>
+                                <button class="btn-action" onclick="window.completeAppt(${appt.id})">Complete</button>
+                            </li>`;
+                    });
+                }
+            } catch (err) { console.error("Schedule Error:", err); }
+        }
+
+        async function dischargePatient(id) {
+            if (!confirm("Discharge this patient?")) return;
+            try {
+                await fetch(`/api/doctor/discharge-patient/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                alert("Patient Discharged");
+                loadCategorizedPatients();
+            } catch (err) { alert('Error discharging'); }
+        }
+
+        async function completeAppt(id) {
+            if (confirm("Mark appointment as completed?")) {
+                try {
+                    await fetch('/api/doctor/appointment-status', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ appointmentId: id, status: 'Completed' })
+                    });
+                    alert("Updated!");
+                    loadAppointments();
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        // Admit Form
+        const admitForm = document.getElementById('admitForm');
+        if (admitForm) {
+            admitForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const payload = Object.fromEntries(formData.entries());
+
+                try {
+                    const res = await fetch('/api/doctor/admit-patient', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    alert(data.message);
+                    if (data.success) {
+                        document.getElementById('admitModal').style.display = 'none';
+                        e.target.reset();
+                        loadCategorizedPatients();
+                    }
+                } catch (err) { alert('Error admitting patient'); }
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Patients - EHR System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* CSS Reset & Body Styles */
+    :root {
+      --primary-green: #4CAF50;
+      --primary-blue: #2196F3;
+      --primary-red: #f44336;
+      --dark-header: #1e293b;
+      --light-bg: #f8fafc;
+      --text-dark: #0f172a;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+    }
+
+    /* Header */
+    header {
+      background-color: var(--dark-header);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo-section { display: flex; align-items: center; gap: 16px; }
+    .logo { height: 80px; }
+    
+    nav ul { display: flex; gap: 24px; list-style: none; padding: 0; margin: 0; }
+    nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+    nav a:hover { color: #fff; }
+    nav a.active { color: #fff; font-weight: 700; }
+
+    .profile-section { display: flex; align-items: center; gap: 12px; }
+    .profile-section .fa-user-circle { font-size: 2rem; color: #94a3b8; }
+    .profile-section h1 { font-size: 1.25rem; margin: 0; font-weight: 600; }
+    
+    /* Main Content */
+    .main-container {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-header h2 { font-size: 2rem; margin: 0; }
+
+    /* Controls */
+    .controls {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    #searchInput {
+        flex-grow: 1;
+        padding: 12px 16px;
+        font-size: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.2s;
+      font-size: 1rem;
+    }
+    .btn-green { background-color: var(--primary-green); color: #fff; }
+    .btn-green:hover { background-color: #45a049; }
+
+    /* Patient Table */
+    .table-container {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+    tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+    .action-buttons { display: flex; gap: 8px; }
+    .btn-view, .btn-discharge {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .btn-view { background-color: var(--primary-blue); }
+    .btn-view:hover { background-color: #1e88e5; }
+    .btn-discharge { background-color: var(--primary-red); }
+    .btn-discharge:hover { background-color: #d32f2f; }
+    
+    /* Popup Styles */
+    .popup-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+    .popup {
+      background: #fff; padding: 24px; border-radius: 12px;
+      width: 90%; max-width: 500px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    .popup h3 { margin-top: 0; }
+    #patientDetailsForm { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .popup label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+    .popup input, .popup textarea {
+      width: 100%; box-sizing: border-box; padding: 10px;
+      border: 1px solid var(--border-color); border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+    .popup .actions {
+      display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;
+    }
+    .popup button {
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none;
+    }
+    .popup button[type="submit"] { background-color: var(--primary-green); color: #fff; }
+    .popup button.close-btn { background-color: #f1f5f9; color: var(--text-dark); }
+
+    footer { text-align: center; color: var(--text-light); padding: 24px; border-top: 1px solid var(--border-color); margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-section">
+        <img src="image/logo.png" alt="EHR Logo" class="logo">
+      </div>
+      <nav>
+        <ul>
+          <li><a href="doctordashboard.html">Dashboard</a></li>
+          <li><a href="Appointment.html">Appointments</a></li>
+          <li><a href="DocPatientSection.html" class="active">Patients</a></li>
+          <li><a href="reports.html">Reports</a></li>
+        </ul>
+      </nav>
+      <div class="profile-section">
+        <i class="fas fa-user-circle"></i>
+        <h1>Dr. <span id="doctorName">—</span></h1>
+        <a href="doctorlogin.html" id="logoutBtn" style="color: #ef4444; margin-left: 16px; font-weight: 600;">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-header">
+      <h2>Admitted Patients</h2>
+    </div>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search by patient name...">
+      <button class="btn btn-green" id="addPatientBtn"><i class="fas fa-plus"></i> Admit New Patient</button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="patientsTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+  
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <h3>Admit New Patient</h3>
+      <form id="patientDetailsForm">
+        <div>
+          <label>Full Name:</label>
+          <input type="text" name="name" required>
+        </div>
+        <div>
+          <label>Email:</label>
+          <input type="email" name="email" required>
+        </div>
+        <div>
+            <label>Contact:</label>
+            <input type="tel" name="contact">
+        </div>
+        <div>
+          <label>Initial Medical History / Notes:</label>
+          <textarea name="condition" rows="3"></textarea>
+        </div>
+        <div class="actions">
+          <button type="button" class="close-btn" id="cancelBtn">Cancel</button>
+          <button type="submit">Save Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 EHR System. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // --- GLOBAL STATE & SESSION MANAGEMENT ---
+    const doctorName = localStorage.getItem('doctorName');
+    const authToken = localStorage.getItem('authToken');
+    let allPatients = [];
+
+    if (!authToken || !doctorName) {
+      alert('Authentication error. You must be logged in to view this page.');
+      window.location.href = 'doctorlogin.html';
+    } else {
+      document.getElementById('doctorName').textContent = doctorName;
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        window.location.href = 'doctorlogin.html';
+    });
+
+    // --- DOM ELEMENTS ---
+    const patientsTableBody = document.getElementById('patientsTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const overlay = document.getElementById('popupOverlay');
+    const addPatientBtn = document.getElementById('addPatientBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const patientDetailsForm = document.getElementById('patientDetailsForm');
+
+    // --- API & RENDERING LOGIC ---
+    function renderPatients(patientArray) {
+      patientsTableBody.innerHTML = '';
+      if (!patientArray || patientArray.length === 0) {
+          patientsTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No admitted patients found.</td></tr>`;
+          return;
+      }
+      patientArray.forEach(patient => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${patient.name}</strong></td>
+          <td><span style="color: var(--primary-green); font-weight: 600;">Admitted</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view" onclick="viewPatientDetails(${patient.id})">View Details</button>
+              <button class="btn-discharge" onclick="dischargePatient(${patient.id}, '${patient.name}')">Discharge</button>
+            </div>
+          </td>
+        `;
+        patientsTableBody.appendChild(row);
+      });
+    }
+    
+    function viewPatientDetails(patientId) {
+      window.location.href = `patient_profile.html?patientId=${patientId}`;
+    }
+
+    async function fetchAndRenderPatients() {
+        try {
+            const response = await fetch('/api/doctor/my-patients', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                alert('Session expired. Please log in again.');
+                localStorage.clear();
+                window.location.href = 'doctorlogin.html';
+                return;
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                allPatients = data.patients;
+                renderPatients(allPatients);
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Error fetching patients:', error);
+        }
+    }
+
+    // NEW: Function to handle discharging a patient
+    async function dischargePatient(patientId, patientName) {
+        if (!confirm(`Are you sure you want to discharge the patient "${patientName}"? They will be removed from this list.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/doctor/discharge-patient/${patientId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(`Patient "${patientName}" has been discharged successfully.`);
+                fetchAndRenderPatients(); // Refresh the list to remove the patient
+            } else {
+                alert(`Failed to discharge patient: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error discharging patient:', error);
+            alert('An error occurred. Could not discharge the patient.');
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    document.addEventListener('DOMContentLoaded', fetchAndRenderPatients);
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredPatients = allPatients.filter(p => p.name.toLowerCase().includes(searchTerm));
+        renderPatients(filteredPatients);
+    });
+
+    // --- POPUP LOGIC FOR ADMITTING PATIENTS ---
+    addPatientBtn.addEventListener('click', () => overlay.style.display = 'flex');
+    cancelBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+        patientDetailsForm.reset();
+    });
+    
+    patientDetailsForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const patientData = {
+          name: this.elements.name.value,
+          email: this.elements.email.value,
+          contact: this.elements.contact.value,
+          medical_history_summary: this.elements.condition.value
+      };
+
+      try {
+        const response = await fetch('/api/doctor/admit-patient', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(patientData)
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Patient admitted successfully!');
+            overlay.style.display = 'none';
+            this.reset();
+            fetchAndRenderPatients();
+        } else {
+            alert(`Error: ${result.message || 'Could not save patient.'}`);
+        }
+      } catch (error) {
+          console.error('Error admitting patient:', error);
+          alert('An error occurred while admitting the patient.');
+      }
+    });
+  </script>
+</body>
+</html>

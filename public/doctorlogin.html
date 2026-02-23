@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic meta tags for responsiveness and character encoding -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EHR - Doctor Login</title>
+
+  <!-- Google Fonts: Inter for modern UI look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Embedded CSS Styles -->
+  <style>
+    /* Base Styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    /* Wrapper for full screen split layout */
+    .login-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ================= LEFT PANEL (Image + Message) ================= */
+    .left-panel {
+      flex: 1;
+      background: url('image/doclogin.png') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px;
+      color: white;
+      position: relative;
+    }
+
+    /* Dark overlay gradient for better text readability */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 50, 90, 0.8), rgba(0, 20, 40, 0.2));
+      z-index: 1;
+    }
+
+    /* Ensure text appears above the gradient overlay */
+    .left-panel h1,
+    .left-panel p {
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ================= RIGHT PANEL (Login Form) ================= */
+    .right-panel {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    /* Form container styling */
+    .login-container {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Form Title */
+    h2 {
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* Input label styling */
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    /* Input field styling */
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d7dbe3;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    /* Login button */
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* Signup note under login form */
+    .note {
+      font-size: 0.9rem;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .note a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    /* Responsive: Hide left panel on smaller screens */
+    @media (max-width: 900px) {
+      .left-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== LOGIN PAGE WRAPPER ====== -->
+  <div class="login-wrapper">
+
+    <!-- ====== LEFT PANEL: WELCOME MESSAGE & IMAGE ====== -->
+    <div class="left-panel">
+      <h1>Welcome Back, Doctor</h1>
+      <p>Log in to access your dashboard, manage patients, and view your schedule.</p>
+    </div>
+
+    <!-- ====== RIGHT PANEL: LOGIN FORM ====== -->
+    <div class="right-panel">
+      <div class="login-container">
+        <h2>Doctor Login</h2>
+
+        <!-- Login Form -->
+        <form id="doctorLoginForm">
+          <label for="lemail">Email Address</label>
+          <input type="email" id="lemail" name="email" placeholder="you@example.com" required>
+
+          <label for="lpassword">Password</label>
+          <input type="password" id="lpassword" name="password" placeholder="Enter your password" required>
+
+          <button type="submit">Login</button>
+        </form>
+
+        <!-- Redirect to signup -->
+        <p class="note">
+          Don’t have an account?
+          <a href="doctorsignup.html">Sign up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== JAVASCRIPT: LOGIN FUNCTIONALITY ====== -->
+  <script>
+    document.getElementById('doctorLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Stop default form submission
+
+      // Capture input values
+      const payload = {
+        email: document.getElementById('lemail').value.trim(),
+        password: document.getElementById('lpassword').value
+      };
+
+      try {
+        // Send login request to API
+        const res = await fetch('/api/doctor/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          // On successful login
+          alert('✅ Login successful!');
+          
+          // CORRECTED KEY: Use 'authToken' to be consistent with all other pages
+          localStorage.setItem('authToken', data.token);
+          
+          // Save the doctor's name
+          localStorage.setItem('doctorName', data.name);
+          
+          // Redirect to doctor dashboard
+          window.location.href = 'doctordashboard.html';
+        } else {
+          // Handle failed login attempt
+          alert(`❌ Login Failed: ${data.message}`);
+        }
+
+      } catch (err) {
+        // Catch server/network errors
+        console.error("Login Error:", err);
+        alert('❌ An error occurred. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>

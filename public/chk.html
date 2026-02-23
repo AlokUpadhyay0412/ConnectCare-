@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Hub - EHR System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --bg-light: #f4f7f6;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* --- HEADER --- */
+        header {
+            background-color: var(--white);
+            padding: 15px 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .welcome-msg {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 0 0 50% 50% / 20px;
+            margin-bottom: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* --- DASHBOARD GRID --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Feature Cards */
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background: #E8F5E9;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            color: var(--text-dark);
+        }
+
+        .card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .card.emergency .icon-box {
+            background: #FFEBEE;
+            color: #D32F2F;
+        }
+
+        .card.emergency:hover::after {
+            background: #D32F2F;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: var(--primary);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* --- DOCTOR INFO CARD (NEW) --- */
+        #docDetailCard {
+            display: none;
+            background: #f0f7f0;
+            border: 1px dashed var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .doc-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doc-info-item p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .doc-info-item strong {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+
+        /* List Styling */
+        .data-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-item {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .list-item h4 {
+            margin: 0 0 5px;
+            color: var(--primary-dark);
+        }
+
+        .list-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* Forms */
+        form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        form input,
+        form select,
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            margin-top: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Profile Details */
+        .profile-details p {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-details strong {
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <i class="fas fa-heartbeat fa-lg"></i> &nbsp; EHR Patient
+    </div>
+    <div class="user-nav">
+        <span class="welcome-msg">Hi, <span id="headerName">User</span></span>
+        <button id="logoutBtn" class="btn-logout">Logout</button>
+    </div>
+</header>
+
+<section class="hero">
+    <h1>Your Personal Health Hub</h1>
+    <p>Access records, book appointments, and manage your health seamlessly.</p>
+    <div
+            style="margin-top:20px; display:inline-block; background:rgba(255,255,255,0.2); padding:8px 16px; border-radius:20px;">
+        <i class="fas fa-calendar-day"></i> Next Visit: <span id="nextVisitDate">Loading...</span>
+    </div>
+</section>
+
+<div class="container">
+    <div class="grid">
+
+        <div class="card" id="card-profile">
+            <div class="icon-box"><i class="fas fa-user-circle"></i></div>
+            <h3>My Profile</h3>
+            <p>View personal info & history</p>
+        </div>
+
+        <div class="card" id="card-book">
+            <div class="icon-box"><i class="fas fa-calendar-plus"></i></div>
+            <h3>Book Appointment</h3>
+            <p>Schedule a visit with a doctor</p>
+        </div>
+
+        <div class="card" id="card-appointments">
+            <div class="icon-box"><i class="fas fa-calendar-check"></i></div>
+            <h3>My Appointments</h3>
+            <p>Track upcoming & past visits</p>
+        </div>
+
+        <div class="card" id="card-chart">
+            <div class="icon-box"><i class="fas fa-chart-line"></i></div>
+            <h3>Health Trends</h3>
+            <p>Visualize your health vitals</p>
+        </div>
+
+        <div class="card" id="card-prescriptions">
+            <div class="icon-box"><i class="fas fa-pills"></i></div>
+            <h3>Prescriptions</h3>
+            <p>View your medication history</p>
+        </div>
+
+        <div class="card emergency" id="card-emergency">
+            <div class="icon-box"><i class="fas fa-ambulance"></i></div>
+            <h3>Emergency</h3>
+            <p>Book Ambulance via ResQNow</p>
+        </div>
+
+    </div>
+</div>
+
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>My Profile</h2><span class="modal-close" data-target="profileModal">&times;</span>
+        </div>
+        <div class="modal-body profile-details">
+            <p><strong>Name:</strong> <span id="profileName">...</span></p>
+            <p><strong>Email:</strong> <span id="profileEmail">...</span></p>
+            <p><strong>Date of Birth:</strong> <span id="profileDOB">...</span></p>
+            <p><strong>Blood Group:</strong> <span id="profileBloodGroup">...</span></p>
+            <p><strong>Contact:</strong> <span id="profilePhone">...</span></p>
+            <p><strong>Address:</strong> <span id="profileAddress">...</span></p>
+            <p><strong>Allergies:</strong> <span id="profileAllergies" style="color:red">...</span></p>
+            <p><strong>History:</strong> <span id="profileHistory">...</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="bookingModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Book Appointment</h2><span class="modal-close" data-target="bookingModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="appointmentForm">
+                <label>Select Doctor</label>
+                <select id="doctorSelect" required onchange="updateDoctorInfo()">
+                    <option value="">Loading...</option>
+                </select>
+
+                <div id="docDetailCard">
+                    <div class="doc-info-row">
+                        <div class="doc-info-item">
+                            <p>Experience</p>
+                            <strong id="displayExp">--</strong>
+                        </div>
+                        <div class="doc-info-item" style="text-align: right;">
+                            <p>Consultation Fee</p>
+                            <strong id="displayFee">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <label>Date</label><input type="date" id="date" required>
+                <label>Time</label><input type="time" id="time" required>
+                <label>Reason / Notes</label><textarea id="notes" rows="3"></textarea>
+                <button type="submit" class="submit-btn">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="appointmentsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>My Appointments</h2><span class="modal-close" data-target="appointmentsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="appointmentsList" class="data-list">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div id="prescriptionsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>My Prescriptions</h2><span class="modal-close" data-target="prescriptionsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="prescriptionsList" class="data-list">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div id="chartModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Health Trends</h2><span class="modal-close" data-target="chartModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div style="height:300px"><canvas id="healthChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const patientName = localStorage.getItem("patientName");
+    const token = localStorage.getItem("token");
+    const patientEmail = localStorage.getItem("patientEmail");
+
+    // Global array to store doctor objects from API
+    let doctorsData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Patient Dashboard Initializing...");
+
+        if (!token) {
+            alert("Please log in first.");
+            window.location.href = "patientlogin.html";
+            return;
+        }
+
+        document.getElementById('headerName').textContent = patientName ? patientName.split(' ')[0] : 'User';
+        if (document.getElementById('profileEmail')) {
+            document.getElementById('profileEmail').textContent = patientEmail;
+        }
+
+        loadProfileDetails();
+
+        document.getElementById('card-profile').addEventListener('click', () => {
+            openModal('profileModal');
+            loadProfileDetails();
+        });
+
+        document.getElementById('card-book').addEventListener('click', () => {
+            openModal('bookingModal');
+            loadDoctors();
+        });
+
+        document.getElementById('card-appointments').addEventListener('click', () => {
+            openModal('appointmentsModal');
+            loadAppointments();
+        });
+
+        document.getElementById('card-chart').addEventListener('click', () => {
+            openModal('chartModal');
+            loadHealthChart();
+        });
+
+        document.getElementById('card-prescriptions').addEventListener('click', () => {
+            openModal('prescriptionsModal');
+            loadPrescriptions();
+        });
+
+        document.getElementById('card-emergency').addEventListener('click', () => {
+            window.open('http://resqnow.netlify.app', '_blank');
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = "index.html";
+        });
+
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.target.dataset.target;
+                document.getElementById(targetId).style.display = 'none';
+            });
+        });
+
+        window.onclick = function (e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        };
+    });
+
+    function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'flex';
+    }
+
+    async function loadProfileDetails() {
+        try {
+            const res = await fetch('/api/patient/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success) {
+                const profile = data.profile;
+                document.getElementById('profileName').textContent = profile.name || 'N/A';
+                document.getElementById('profileDOB').textContent = profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'N/A';
+                document.getElementById('profileBloodGroup').textContent = profile.blood_group || 'N/A';
+                document.getElementById('profilePhone').textContent = profile.contact_phone || 'N/A';
+                document.getElementById('profileAddress').textContent = profile.address || 'N/A';
+                document.getElementById('profileAllergies').textContent = profile.allergies || 'N/A';
+                document.getElementById('profileHistory').textContent = profile.medical_history_summary || 'N/A';
+
+                const nextDate = profile.next_visit_date ? new Date(profile.next_visit_date).toLocaleDateString() : 'No upcoming visits';
+                document.getElementById('nextVisitDate').textContent = nextDate;
+            }
+        } catch (err) { console.error("Profile Error:", err); }
+    }
+
+    // UPDATED: Load Doctors and store data
+    async function loadDoctors() {
+        try {
+            const res = await fetch(`/api/doctors`);
+            const data = await res.json();
+            if (data.success) {
+                doctorsData = data.doctors; // Store globally
+                const doctorSelect = document.getElementById("doctorSelect");
+                doctorSelect.innerHTML = '<option value="">-- Select a Doctor --</option>';
+                doctorsData.forEach(doc => {
+                    const option = new Option(`${doc.name} - ${doc.specialization}`, doc.id);
+                    doctorSelect.appendChild(option);
+                });
+            }
+        } catch (err) { console.error("Doctors Error:", err); }
+    }
+
+    // NEW: Function to show doctor specifics when dropdown changes
+    function updateDoctorInfo() {
+        const selectedId = document.getElementById('doctorSelect').value;
+        const infoCard = document.getElementById('docDetailCard');
+
+        // Find matching doctor object in our stored array
+        const doc = doctorsData.find(d => d.id == selectedId);
+
+        if (doc) {
+            infoCard.style.display = 'block';
+            document.getElementById('displayExp').textContent = `${doc.experience_years || '0'} Years`;
+            document.getElementById('displayFee').textContent = `₹${doc.fee || doc.consultation_fee || '0'}`;
+        } else {
+            infoCard.style.display = 'none';
+        }
+    }
+
+    document.getElementById("appointmentForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        const payload = {
+            doctorId: document.getElementById("doctorSelect").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value,
+            notes: document.getElementById("notes").value
+        };
+        try {
+            const res = await fetch("/api/appointments/book", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message);
+            if (data.success) {
+                document.getElementById('bookingModal').style.display = 'none';
+                e.target.reset();
+                loadAppointments();
+            }
+        } catch (err) { alert("An error occurred while booking."); }
+    });
+
+    async function loadAppointments() {
+        const list = document.getElementById("appointmentsList");
+        list.innerHTML = "<p>Loading...</p>";
+        try {
+            const res = await fetch(`/api/appointments`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            if (data.success) {
+                list.innerHTML = "";
+                if (data.appointments.length === 0) {
+                    list.innerHTML = "<p>You have no upcoming appointments.</p>";
+                    return;
+                }
+                data.appointments.forEach(app => {
+                    const card = document.createElement('div');
+                    card.className = 'list-item';
+                    card.innerHTML = `<h4>Dr. ${app.doctor_name}</h4><p>${app.specialization}</p><p><strong>${app.status}:</strong> ${app.date} at ${app.time}</p><p>Notes: ${app.notes || 'N/A'}</p>`;
+                    list.appendChild(card);
+                });
+            }
+        } catch (err) { list.innerHTML = "<p>Could not load appointments.</p>"; }
+    }
+
+    async function loadPrescriptions() {
+        const list = document.getElementById("prescriptionsList");
+        list.innerHTML = "<p>Loading...</p>";
+        try {
+            const res = await fetch(`/api/patient/prescriptions`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            if (data.success) {
+                list.innerHTML = "";
+                if (data.prescriptions.length === 0) {
+                    list.innerHTML = "<p>You have no prescriptions on record.</p>";
+                    return;
+                }
+                data.prescriptions.forEach(rx => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    const issuedDate = new Date(rx.date_issued).toLocaleDateString();
+                    item.innerHTML = `<h4>${rx.medication} (${rx.dosage || 'N/A'})</h4><p>Prescribed by Dr. ${rx.doctor_name} on ${issuedDate}</p>`;
+                    list.appendChild(item);
+                });
+            }
+        } catch (err) { list.innerHTML = "<p>Could not load prescriptions.</p>"; }
+    }
+
+    let myChart;
+    async function loadHealthChart() {
+        try {
+            const res = await fetch(`/api/patient/reports`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const reportData = await res.json();
+
+            if (!reportData.success || !reportData.labels || reportData.labels.length === 0) {
+                document.getElementById("healthChart").parentNode.innerHTML =
+                    '<p style="text-align:center; padding:50px; color: #666;">No recent report data to display.</p>';
+                return;
+            }
+
+            const ctx = document.getElementById("healthChart").getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: reportData.labels,
+                    datasets: [
+                        {
+                            label: 'BP Systolic',
+                            data: reportData.bp_systolic,
+                            borderColor: '#d9534f',
+                            backgroundColor: '#d9534f',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'BP Diastolic',
+                            data: reportData.bp_diastolic,
+                            borderColor: '#f0ad4e',
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'Sugar (mg/dL)',
+                            data: reportData.sugar,
+                            borderColor: '#0275d8',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'Weight (kg)',
+                            data: reportData.weight,
+                            borderColor: '#FF9800',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'SPO2 (%)',
+                            data: reportData.spo2,
+                            borderColor: '#9C27B0',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'Temp (°F)',
+                            data: reportData.temp,
+                            borderColor: '#F44336',
+                            tension: 0.2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Value' }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Chart Error:", err);
+        }
+    }
+</script>
+</body>
+
+</html>

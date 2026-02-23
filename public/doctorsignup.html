@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EHR - Doctor Signup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-color: #4CAF50;
+      --primary-hover: #45a049;
+      --text-dark: #2d3436;
+      --text-light: #636e72;
+      --border-color: #d7dbe3;
+      --bg-gray: #f8f9fa;
+    }
+
+    /* Prevent the whole page from scrolling */
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-gray);
+    }
+
+    .signup-wrapper {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    /* --- STATIC LEFT PANEL --- */
+    .left-panel {
+      flex: 1.2;
+      background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 60px;
+      color: white;
+      position: relative;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 50, 90, 0.85), rgba(0, 20, 40, 0.3));
+      z-index: 1;
+    }
+
+    .left-panel-content { position: relative; z-index: 2; }
+    .left-panel h1 { font-size: 3rem; margin-bottom: 20px; line-height: 1.2; }
+    .left-panel p { font-size: 1.2rem; opacity: 0.9; max-width: 500px; }
+
+    /* --- SCROLLABLE RIGHT SECTION --- */
+    .right-panel {
+        flex: 1;
+        height: 100vh; /* Lock height to viewport */
+        overflow-y: auto; /* Only this half will scroll */
+        background-color: var(--bg-gray);
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+        scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar for the right panel */
+    .right-panel::-webkit-scrollbar { width: 8px; }
+    .right-panel::-webkit-scrollbar-track { background: #f1f1f1; }
+    .right-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    .right-panel::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+    .signup-container {
+        width: 100%;
+        max-width: 550px;
+        background: #fff;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        margin-bottom: 40px; /* Space at bottom after scrolling */
+        height: fit-content;
+    }
+
+    /* --- FORM STYLING --- */
+    h2 { font-size: 1.8rem; margin: 0 0 8px 0; color: var(--text-dark); text-align: center; }
+    .subtitle { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 0.95rem; }
+
+    .section-title {
+      margin-top: 25px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--bg-gray);
+      color: var(--primary-color);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+    }
+
+    form label { display: block; margin-top: 18px; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: var(--text-dark); }
+    form input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+    form input:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1); }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    button {
+      width: 100%;
+      margin-top: 30px;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary-color);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3); }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+
+    .note { font-size: 0.9rem; margin-top: 25px; text-align: center; color: var(--text-light); }
+    .note a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 1100px) { .left-panel { flex: 0.8; } }
+    @media (max-width: 900px) {
+        body, html { overflow: auto; } /* Re-enable scroll for mobile */
+        .signup-wrapper { flex-direction: column; height: auto; }
+        .left-panel { display: none; }
+        .right-panel { height: auto; overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="signup-wrapper">
+  <div class="left-panel">
+    <div class="left-panel-content">
+      <h1>Empower Your Practice</h1>
+      <p>Join thousands of healthcare providers using our secure EHR platform to manage patients and digital prescriptions.</p>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="signup-container">
+      <h2>Doctor's Registration</h2>
+      <p class="subtitle">Complete the form below to create your account</p>
+
+      <form id="doctorSignupForm">
+        <div class="section-title">Account Information</div>
+        <label for="dname">Full Name</label>
+        <input type="text" id="dname" placeholder="Dr. Alok Upadhyay" required>
+
+        <div class="row">
+          <div>
+            <label for="demail">Email Address</label>
+            <input type="email" id="demail" placeholder="alokupadhyay@hospital.com" required>
+          </div>
+          <div>
+            <label for="phone">Contact Number</label>
+            <input type="tel" id="phone" placeholder="+91 XXXXX XXXXX" required>
+          </div>
+        </div>
+
+        <div class="section-title">Professional Credentials</div>
+        <div class="row">
+          <div>
+            <label for="specialization">Specialization</label>
+            <input type="text" id="specialization" placeholder="Cardiology" required>
+          </div>
+          <div>
+            <label for="license">License Number</label>
+            <input type="text" id="license" placeholder="Reg No. 12345" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="experience">Experience (Years)</label>
+            <input type="number" id="experience" min="0" placeholder="10" required>
+          </div>
+          <div>
+            <label for="aadhar">Aadhar Number</label>
+            <input type="text" id="aadhar" placeholder="12 Digit ID" pattern="[0-9]{12}" required>
+          </div>
+        </div>
+
+        <div class="section-title">Practice Details</div>
+        <label for="clinicAddress">Clinic/Hospital Address</label>
+        <input type="text" id="clinicAddress" placeholder="Full location address" required>
+
+        <label for="fee">Consultation Fee (₹)</label>
+        <input type="number" id="fee" min="0" placeholder="500" required>
+
+        <div class="section-title">Security</div>
+        <div class="row">
+          <div>
+            <label for="dpassword">Password</label>
+            <input type="password" id="dpassword" placeholder="••••••••" required>
+          </div>
+          <div>
+            <label for="cpassword">Confirm Password</label>
+            <input type="password" id="cpassword" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn">Register</button>
+      </form>
+
+      <p class="note">Already registered? <a href="doctorlogin.html">Sign In</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('doctorSignupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const password = document.getElementById('dpassword').value;
+    const confirm = document.getElementById('cpassword').value;
+
+    // Basic Validation
+    if (password !== confirm) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    }
+
+    // Prepare Payload
+    const payload = {
+      name: document.getElementById('dname').value.trim(),
+      email: document.getElementById('demail').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      specialization: document.getElementById('specialization').value.trim(),
+      license: document.getElementById('license').value.trim(),
+      experience: document.getElementById('experience').value,
+      aadhar: document.getElementById('aadhar').value,
+      clinicAddress: document.getElementById('clinicAddress').value.trim(),
+      fee: document.getElementById('fee').value,
+      password: password
+    };
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Processing...";
+
+      const res = await fetch('/api/doctor/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Registration Successful! Redirecting to login...");
+        window.location.href = 'doctorlogin.html';
+      } else {
+        alert("Signup Failed: " + (data.message || "Unknown error"));
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Create Professional Account";
+      }
+    } catch (err) {
+      console.error("Signup Error:", err);
+      alert('An error occurred connecting to the server. Please try again later.');
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Create Professional Account";
+    }
+  });
+</script>
+</body>
+</html>

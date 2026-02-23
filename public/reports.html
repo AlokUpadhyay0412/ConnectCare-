@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Reports - EHR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* --- THEME VARIABLES --- */
+    :root {
+      --primary: #4CAF50;
+      --primary-dark: #2E7D32;
+      --bg-light: #f4f7f6;
+      --text-dark: #333;
+      --text-light: #666;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --border-color: #e0e0e0;
+    }
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: var(--white);
+      padding: 15px 5%;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .nav-links a.active {
+      color: var(--primary);
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn-logout {
+      padding: 8px 20px;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-logout:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* --- MAIN LAYOUT --- */
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px 60px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-header h2 {
+      font-size: 2rem;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* --- CONTROLS --- */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    #searchInput {
+      flex-grow: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #searchInput:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-green {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-green:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* --- TABLE --- */
+    .table-container {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 18px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover {
+      background-color: #fcfcfc;
+    }
+
+    .btn-view {
+      background-color: #2196F3;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-view:hover {
+      background-color: #1976D2;
+    }
+
+    /* --- MODALS --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--white);
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: slideUp 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      background: var(--primary);
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .modal-close {
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
+      opacity: 0.8;
+    }
+
+    .modal-close:hover {
+      opacity: 1;
+    }
+
+    .modal-body {
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    /* Forms inside Modal */
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .modal-footer {
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      background: #f1f1f1;
+      color: #333;
+    }
+
+    /* View Report Details Styling */
+    .report-detail-group {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+
+    .report-detail-group:last-child {
+      border-bottom: none;
+    }
+
+    .report-label {
+      color: #888;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .report-value {
+      font-size: 1.1rem;
+      color: #333;
+      font-weight: 500;
+    }
+
+    /* Vitals Grid for View Modal & Form */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo"><i class="fas fa-user-md fa-lg"></i> &nbsp; EHR Doctor</div>
+  <div class="nav-links">
+    <a href="doctorDashboard.html">Dashboard</a>
+    <a href="reports.html" class="active">Reports</a>
+  </div>
+  <div style="display:flex; align-items:center; gap:15px;">
+    <span>Dr. <strong id="doctorName">...</strong></span>
+    <button class="btn-logout" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-header">
+    <h2>Patient Reports Management</h2>
+  </div>
+
+  <div class="controls">
+    <div style="flex-grow:1; position: relative;">
+      <i class="fas fa-search" style="position: absolute; left: 15px; top: 15px; color: #aaa;"></i>
+      <input type="text" id="searchInput" placeholder="Search by patient name or diagnosis..."
+             style="padding-left: 40px;">
+    </div>
+    <button class="btn btn-green" id="openGenerateModal">
+      <i class="fas fa-plus-circle"></i> Create Report
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Patient Name</th>
+        <th>Report Date</th>
+        <th>Condition / Diagnosis</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="reportsTableBody">
+      <tr>
+        <td colspan="5" style="text-align:center; padding:30px;">Loading reports...</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="generateModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Generate New Medical Report</h3>
+      <span class="modal-close" data-target="generateModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="generateReportForm">
+        <div class="full-width">
+          <label>Select Patient</label>
+          <select id="patientSelect" name="patient_id" required>
+            <option value="">Loading patients...</option>
+          </select>
+        </div>
+
+        <div class="full-width">
+          <label>Condition / Diagnosis</label>
+          <input type="text" name="condition" placeholder="e.g. Hypertension, Viral Fever" required>
+        </div>
+
+        <div class="full-width vitals-grid">
+          <strong style="grid-column: 1/-1; color: var(--primary);">Vitals</strong>
+
+          <div><label>Temp (°F)</label><input type="number" step="0.1" name="temperature" placeholder="98.6"></div>
+          <div><label>Weight (kg)</label><input type="number" step="0.1" name="weight" placeholder="70.5"></div>
+          <div><label>SPO2 (%)</label><input type="number" name="spo2" placeholder="98"></div>
+
+          <div><label>BP Systolic</label><input type="number" name="bp_systolic" placeholder="120"></div>
+          <div><label>BP Diastolic</label><input type="number" name="bp_diastolic" placeholder="80"></div>
+          <div><label>Sugar (mg/dL)</label><input type="number" name="blood_sugar" placeholder="100"></div>
+          <div><label>Hemoglobin</label><input type="number" step="0.1" name="hemoglobin" placeholder="14.0"></div>
+        </div>
+
+        <div class="full-width">
+          <label>Detailed Observations</label>
+          <textarea name="details" rows="4" required
+                    placeholder="Enter detailed medical observations here..."></textarea>
+        </div>
+
+        <input type="hidden" name="report_date" id="report_date_input">
+
+        <div class="full-width modal-footer">
+          <button type="button" class="btn btn-cancel" id="cancelGenerate">Cancel</button>
+          <button type="submit" class="btn btn-green">Save Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="viewModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Medical Report Details</h3>
+      <span class="modal-close" data-target="viewModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="report-detail-group">
+        <span class="report-label">Patient Name</span>
+        <div class="report-value" id="viewPatientName">--</div>
+      </div>
+
+      <div class="report-detail-group">
+        <span class="report-label">Date Issued</span>
+        <div class="report-value" id="viewReportDate">--</div>
+      </div>
+
+      <div class="report-detail-group">
+        <span class="report-label">Condition / Diagnosis</span>
+        <div class="report-value" id="viewCondition" style="color: var(--primary); font-weight: 700;">--</div>
+      </div>
+
+      <div class="report-detail-group">
+        <span class="report-label">Vitals & Metrics</span>
+        <div class="vitals-grid">
+          <div><small>Temperature:</small> <strong id="viewTemp">--</strong></div>
+          <div><small>Weight:</small> <strong id="viewWeight">--</strong></div>
+          <div><small>SPO2:</small> <strong id="viewSPO2">--</strong></div>
+
+          <div><small>BP Systolic:</small> <strong id="viewBPsys">--</strong></div>
+          <div><small>BP Diastolic:</small> <strong id="viewBPdia">--</strong></div>
+          <div><small>Blood Sugar:</small> <strong id="viewSugar">--</strong></div>
+          <div><small>Hemoglobin:</small> <strong id="viewHemo">--</strong></div>
+        </div>
+      </div>
+
+      <div class="report-detail-group">
+        <span class="report-label">Detailed Observations</span>
+        <p class="report-value" id="viewDetails"
+           style="font-size: 1rem; line-height: 1.6; background:#fff; padding:10px; border:1px solid #eee; border-radius:4px;">
+          --</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-green" id="closeViewBtn">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- 1. GLOBAL SETUP ---
+  const authToken = localStorage.getItem('authToken');
+  const doctorName = localStorage.getItem('doctorName');
+  let ALL_REPORTS = []; // Store reports locally for quick search/view
+
+  // --- 2. INITIALIZATION ---
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!authToken) {
+      window.location.href = 'doctorlogin.html';
+      return;
+    }
+    document.getElementById('doctorName').textContent = doctorName || 'Doctor';
+
+    // Load Data
+    loadReports();
+
+    // --- 3. EVENT DELEGATION FOR VIEW BUTTONS ---
+    document.getElementById('reportsTableBody').addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn-view');
+      if (btn) {
+        const reportId = btn.getAttribute('data-id');
+        openViewModal(reportId);
+      }
+    });
+
+    // --- 4. OTHER EVENT LISTENERS ---
+
+    // Close Modals (X buttons)
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const targetId = e.target.dataset.target;
+        document.getElementById(targetId).style.display = 'none';
+      });
+    });
+
+    // Close View Modal (Bottom Button)
+    document.getElementById('closeViewBtn').addEventListener('click', () => {
+      document.getElementById('viewModal').style.display = 'none';
+    });
+
+    // Open Generate Modal
+    document.getElementById('openGenerateModal').addEventListener('click', loadPatientsAndOpenModal);
+
+    // Cancel Generate
+    document.getElementById('cancelGenerate').addEventListener('click', () => {
+      document.getElementById('generateModal').style.display = 'none';
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = ALL_REPORTS.filter(r =>
+        (r.patient_name && r.patient_name.toLowerCase().includes(term)) ||
+        (r.condition && r.condition.toLowerCase().includes(term))
+      );
+      renderReports(filtered);
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    // Submit Report
+    document.getElementById('generateReportForm').addEventListener('submit', submitReport);
+  });
+
+  // --- 5. DATA LOADING & RENDERING ---
+
+  async function loadReports() {
+    try {
+      let res = await fetch(`/api/doctor/recent-reports`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        ALL_REPORTS = data.reports;
+        renderReports(ALL_REPORTS);
+      }
+    } catch (err) { console.error("Error loading reports:", err); }
+  }
+
+  function renderReports(reports) {
+    const tbody = document.getElementById('reportsTableBody');
+    tbody.innerHTML = '';
+
+    if (!reports || reports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">No reports found.</td></tr>`;
+      return;
+    }
+
+    reports.forEach(r => {
+      const dateStr = r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A';
+      const pName = r.patient_name || r.patientName || 'Unknown';
+
+      const row = `
+                  <tr>
+                      <td><strong>${pName}</strong></td>
+                      <td>${dateStr}</td>
+                      <td>${r.condition || '--'}</td>
+                      <td><span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:12px; font-size:0.8rem; font-weight:600;">Completed</span></td>
+                      <td>
+                          <button class="btn-view" data-id="${r.id}">
+                              <i class="fas fa-eye"></i> View
+                          </button>
+                      </td>
+                  </tr>
+              `;
+      tbody.innerHTML += row;
+    });
+  }
+
+  // --- 6. MODAL LOGIC ---
+
+  function openViewModal(reportId) {
+    const report = ALL_REPORTS.find(r => r.id == reportId);
+
+    if (!report) {
+      alert("Error: Report details not found in local data.");
+      return;
+    }
+
+    document.getElementById('viewPatientName').textContent = report.patient_name || report.patientName || 'Unknown';
+    document.getElementById('viewReportDate').textContent = report.report_date ? new Date(report.report_date).toLocaleDateString() : 'N/A';
+    document.getElementById('viewCondition').textContent = report.condition || 'N/A';
+
+    // Update Vitals Fields
+    document.getElementById('viewTemp').textContent = report.temperature ? report.temperature + ' °F' : '--';
+    document.getElementById('viewWeight').textContent = report.weight ? report.weight + ' kg' : '--';
+    document.getElementById('viewSPO2').textContent = report.spo2 ? report.spo2 + ' %' : '--';
+    document.getElementById('viewBPsys').textContent = report.bp_systolic || '--';
+    document.getElementById('viewBPdia').textContent = report.bp_diastolic || '--';
+    document.getElementById('viewSugar').textContent = report.blood_sugar || '--';
+    document.getElementById('viewHemo').textContent = report.hemoglobin || '--';
+
+    document.getElementById('viewDetails').textContent = report.details || 'No additional details provided.';
+
+    document.getElementById('viewModal').style.display = 'flex';
+  }
+
+  async function loadPatientsAndOpenModal() {
+    try {
+      const res = await fetch(`/api/doctor/my-patients`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+      const data = await res.json();
+      if (data.success) {
+        const select = document.getElementById('patientSelect');
+        select.innerHTML = '<option value="">Select Patient...</option>';
+        data.patients.forEach(p => {
+          select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+        });
+        document.getElementById('report_date_input').value = new Date().toISOString().split('T')[0];
+        document.getElementById('generateModal').style.display = 'flex';
+      }
+    } catch (e) { alert("Error loading patients list."); }
+  }
+
+  async function submitReport(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch('/api/doctor/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ reportData: payload })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Report Saved Successfully!");
+        document.getElementById('generateModal').style.display = 'none';
+        e.target.reset();
+        loadReports();
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) { alert("Server error."); }
+  }
+
+</script>
+</body>
+
+</html>

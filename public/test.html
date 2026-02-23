@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Doctor Dashboard - EHR System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* CSS Reset & Body Styles */
+    :root {
+      --primary-green: #4CAF50;
+      --primary-blue: #2196F3;
+      --dark-header: #1e293b;
+      --light-bg: #f8fafc;
+      --text-dark: #0f172a;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+    }
+
+    /* Header */
+    header {
+      background-color: var(--dark-header);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo-section { display: flex; align-items: center; gap: 16px; }
+    .logo { height: 40px; }
+    .header-container h1 { font-size: 1.25rem; margin: 0; font-weight: 600; }
+    
+    nav ul { display: flex; gap: 24px; list-style: none; padding: 0; margin: 0; }
+    nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+    nav a:hover { color: #fff; }
+    
+    .profile-section { display: flex; align-items: center; gap: 12px; }
+    .profile-section .fa-user-circle { font-size: 2rem; color: #94a3b8; }
+    
+    /* Main Dashboard Layout */
+    .dashboard {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .overview h2 { font-size: 2rem; margin-top: 0; }
+    .overview p { font-size: 1rem; color: var(--text-light); margin-top: -10px; }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .card-icon {
+      font-size: 1.5rem;
+      color: #fff;
+      height: 48px;
+      width: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+    }
+    .patients-icon { background-color: var(--primary-blue); }
+    .appointments-icon { background-color: #f59e0b; }
+    .reports-icon { background-color: var(--primary-green); }
+
+    .card h3 { margin: 0; font-size: 1.2rem; }
+    .card-stat { font-size: 2rem; font-weight: 700; margin: 8px 0; }
+    .card p { color: var(--text-light); flex-grow: 1; }
+    .card-actions { margin-top: 16px; display: flex; gap: 12px; }
+    
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+    .btn-primary { background-color: var(--primary-blue); color: #fff; }
+    .btn-primary:hover { background-color: #1e88e5; }
+    .btn-secondary { background-color: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background-color: #cbd5e1; }
+    
+    /* Popup Styles */
+    .popup-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+    .popup {
+      background: #fff; padding: 24px; border-radius: 12px;
+      width: 90%; max-width: 500px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    .popup h3 { margin-top: 0; }
+    #patientDetailsForm { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    #patientDetailsForm .full-width { grid-column: 1 / -1; }
+    .popup label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+    .popup input {
+      width: 100%; box-sizing: border-box; padding: 10px;
+      border: 1px solid var(--border-color); border-radius: 8px;
+    }
+    .popup .actions {
+      grid-column: 1 / -1;
+      display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;
+    }
+    .popup button {
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none;
+    }
+    .popup button[type="submit"] { background-color: var(--primary-green); color: #fff; }
+    .popup button.close-btn { background-color: #f1f5f9; color: var(--text-dark); }
+    
+    footer { text-align: center; color: var(--text-light); padding: 24px; border-top: 1px solid var(--border-color); margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-section">
+        <img src="https://helloindia.co/companyimages/1034591/1.png" alt="EHR Logo" class="logo">
+      </div>
+      <nav>
+        <ul>
+          <li><a href="Appointment.html">Appointments</a></li>
+          <li><a href="DocPatientSection.html">Patients</a></li>
+          <li><a href="reports.html">Reports</a></li>
+        </ul>
+      </nav>
+      <div class="profile-section">
+        <i class="fas fa-user-circle"></i>
+        <h1>Welcome, Dr. <span id="doctorName">—</span></h1>
+        <a href="doctorlogin.html" id="logoutBtn" style="color: #ef4444; margin-left: 16px; font-weight: 600;">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="dashboard">
+    <div class="overview">
+      <h2>Dashboard Overview</h2>
+      <p>Here's a snapshot of your practice for today.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon patients-icon"><i class="fas fa-users"></i></div>
+          <h3>Total Patients</h3>
+        </div>
+        <p class="card-stat">124</p>
+        <p>View and manage your patient records securely.</p>
+        <div class="card-actions">
+          <a href="DocPatientSection.html" class="btn btn-primary">View All</a>
+          <button id="addPatientBtn" class="btn btn-secondary">Add New</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon appointments-icon"><i class="fas fa-calendar-check"></i></div>
+          <h3>Today's Appointments</h3>
+        </div>
+        <p class="card-stat">8</p>
+        <p>Manage your schedule for today and view upcoming visits.</p>
+        <div class="card-actions">
+          <a href="Appointment.html" class="btn btn-primary">View Schedule</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon reports-icon"><i class="fas fa-chart-bar"></i></div>
+          <h3>Pending Reports</h3>
+        </div>
+        <p class="card-stat">3</p>
+        <p>Generate, review, and finalize patient reports.</p>
+        <div class="card-actions">
+          <a href="reports.html" class="btn btn-primary">View Reports</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <h3>Add New Patient Details</h3>
+      <form id="patientDetailsForm">
+        <div class="full-width">
+          <label>Email:</label>
+          <input type="email" name="email" required>
+        </div>
+        <div>
+          <label>Age:</label>
+          <input type="number" name="age" min="0" max="150">
+        </div>
+        <div>
+            <label>Gender:</label>
+            <input type="text" name="gender" placeholder="Male/Female/Other">
+        </div>
+        <div>
+            <label>Weight (kg):</label>
+            <input type="number" name="weight" step="0.1" min="0">
+        </div>
+        <div>
+            <label>Height (cm):</label>
+            <input type="number" name="height" step="0.1" min="0">
+        </div>
+        <div class="full-width">
+            <label>Contact:</label>
+            <input type="tel" name="contact">
+        </div>
+        <div class="full-width">
+          <label>Initial Condition / Notes:</label>
+          <input type="text" name="condition">
+        </div>
+        <div class="actions">
+          <button type="button" class="close-btn" id="cancelBtn">Cancel</button>
+          <button type="submit">Save Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 EHR System. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Session: show doctor name or redirect to login
+    (function init() {
+      const name = localStorage.getItem('doctorName');
+      const email = localStorage.getItem('doctorEmail');
+      if (!email) {
+        window.location.href = 'doctorlogin.html';
+        return;
+      }
+      document.getElementById('doctorName').textContent = name || '(Doctor)';
+    })();
+
+    // Logout clears session data
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      localStorage.removeItem('doctorName');
+      localStorage.removeItem('doctorEmail');
+    });
+
+    // Popup handlers
+    const overlay = document.getElementById('popupOverlay');
+    const addPatientBtn = document.getElementById('addPatientBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    if (addPatientBtn) {
+        addPatientBtn.addEventListener('click', () => {
+          overlay.style.display = 'flex';
+        });
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          overlay.style.display = 'none';
+        });
+    }
+
+    // Save patient details
+    document.getElementById('patientDetailsForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const payload = {};
+      formData.forEach((value, key) => payload[key] = value);
+
+      try {
+        // This is a FAKE API call for demonstration
+        console.log('Patient Details Payload:', payload);
+        alert('✅ Patient details saved successfully!');
+        overlay.style.display = 'none';
+        this.reset();
+      } catch (err) {
+        console.error(err);
+        alert('❌ Error connecting to server');
+      }
+    });
+  </script>
+</body>
+</html>

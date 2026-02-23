@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Patient Profile - EHR System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary-green: #4CAF50;
+      --primary-blue: #2196F3;
+      --dark-header: #1e293b;
+      --light-bg: #f8fafc;
+      --text-dark: #0f172a;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+    }
+    body, html {
+      margin: 0; padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+    }
+    header {
+      background-color: var(--dark-header); color: #fff;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header-container {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px; max-width: 1400px; margin: 0 auto;
+    }
+    .logo { height: 80px; }
+    nav ul { display: flex; gap: 24px; list-style: none; padding: 0; margin: 0; }
+    nav a { color: #cbd5e1; text-decoration: none; font-weight: 600; }
+    .profile-section { display: flex; align-items: center; gap: 12px; }
+    .profile-section .fa-user-circle { font-size: 2rem; }
+    .profile-section h1 { font-size: 1.25rem; margin: 0; }
+    .main-container { padding: 32px; max-width: 1200px; margin: 0 auto; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-header h2 { font-size: 2rem; margin: 0; }
+    .btn-back {
+        text-decoration: none; color: var(--text-light); font-weight: 600;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+    }
+    .card {
+        background: #fff; border-radius: 12px; padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+    }
+    .card h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; font-size: 1.25rem; }
+    .detail-item { margin-bottom: 12px; }
+    .detail-item strong { display: block; color: var(--text-light); font-size: 0.9rem; margin-bottom: 4px; }
+    .detail-item span { font-size: 1rem; }
+    #patientName { color: var(--primary-blue); }
+    .placeholder { text-align: center; padding: 40px; color: var(--text-light); font-style: italic; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <img src="image/logo.png" alt="EHR Logo" class="logo">
+      <nav>
+        <ul>
+          <li><a href="doctordashboard.html">Dashboard</a></li>
+          <li><a href="Appointment.html">Appointments</a></li>
+          <li><a href="DocPatientSection.html">Patients</a></li>
+          <li><a href="reports.html">Reports</a></li>
+        </ul>
+      </nav>
+      <div class="profile-section">
+        <i class="fas fa-user-circle"></i>
+        <h1>Dr. <span id="doctorNameHeader">—</span></h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-header">
+      <h2>Patient Profile: <span id="patientName">Loading...</span></h2>
+      <a href="DocPatientSection.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Patient List</a>
+    </div>
+
+    <div class="profile-grid">
+      <div class="card">
+        <h3>Personal Information</h3>
+        <div class="detail-item">
+          <strong>Contact Phone</strong>
+          <span id="contactPhone">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Date of Birth</strong>
+          <span id="dob">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Address</strong>
+          <span id="address">--</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Medical Details</h3>
+        <div class="detail-item">
+          <strong>Blood Group</strong>
+          <span id="bloodGroup">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Known Allergies</strong>
+          <span id="allergies">--</span>
+        </div>
+      </div>
+      
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Medical History Summary</h3>
+        <p id="medicalHistory">--</p>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Medical Reports</h3>
+        <div id="reportsContainer">
+          <div class="placeholder">
+            <i class="fas fa-exclamation-circle"></i>
+            Feature to display past reports is not yet available in the backend.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const doctorName = localStorage.getItem('doctorName');
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken || !doctorName) {
+      alert('Authentication error. You must be logged in.');
+      window.location.href = 'doctorlogin.html';
+    } else {
+      document.getElementById('doctorNameHeader').textContent = doctorName;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get patient ID from the URL (e.g., patient_profile.html?patientId=101)
+      const urlParams = new URLSearchParams(window.location.search);
+      const patientId = urlParams.get('patientId');
+
+      if (!patientId) {
+        alert('No patient ID provided.');
+        window.location.href = 'DocPatientSection.html';
+        return;
+      }
+      
+      fetchPatientProfile(patientId);
+    });
+
+    async function fetchPatientProfile(patientId) {
+      try {
+        const response = await fetch(`/api/doctor/patient-profile/${patientId}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          throw new Error('Could not fetch patient profile.');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          displayProfileData(data.profile);
+        } else {
+          alert(`Error: ${data.message}`);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        alert('An error occurred while fetching patient data.');
+      }
+    }
+
+    function displayProfileData(profile) {
+      // Helper to display data or a default value
+      const render = (value) => value || '--';
+
+      document.getElementById('patientName').textContent = render(profile.name);
+      document.getElementById('contactPhone').textContent = render(profile.contact_phone);
+      // Format date if it exists
+      document.getElementById('dob').textContent = profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : '--';
+      document.getElementById('address').textContent = render(profile.address);
+      document.getElementById('bloodGroup').textContent = render(profile.blood_group);
+      document.getElementById('allergies').textContent = render(profile.allergies);
+      document.getElementById('medicalHistory').textContent = render(profile.medical_history_summary);
+    }
+  </script>
+</body>
+</html>

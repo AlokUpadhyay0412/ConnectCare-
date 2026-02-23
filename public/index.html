@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EHR System - Welcome</title>
+    <link rel="stylesheet" href="landingcss.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Select Your Role</h2>
+            <p>Please choose your portal to log in.</p>
+            <div class="modal-buttons">
+                <a href="doctorlogin.html" class="btn doctor">
+                    <i class="fas fa-user-md"></i> Doctor Portal
+                </a>
+                <a href="patientlogin.html" class="btn patient">
+                    <i class="fas fa-user-injured"></i> Patient Portal
+                </a>
+                <a href="adminlogin.html" class="btn admin">
+                    <i class="fas fa-user-shield"></i> Admin Portal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <img src="image/logo.png" alt="EHR Logo" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="http://resqnow.netlify.app">Book Ambulance</a></li>
+                </ul>
+            </nav>
+            <button id="loginBtn" class="btn login">Login/SignUp</button>
+
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Revolutionizing Healthcare, One Record at a Time</h1>
+            <p>Our state-of-the-art EHR system provides a secure, seamless, and efficient way to manage health records for medical professionals and patients.</p>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2 class="section-title">Our Mission</h2>
+        <div class="about-container">
+            <p>We are dedicated to enhancing the quality of healthcare by providing an intuitive and powerful Electronic Health Record system. Our mission is to empower doctors with comprehensive data and to provide patients with easy access to their own health information, fostering a more collaborative and informed approach to wellness.</p>
+        </div>
+    </section>
+
+    <div id="features">
+        <h2 class="section-title">Key Features</h2>
+
+        <section class="how-to-section">
+            <div class="how-to-container">
+                <div class="how-to-image">
+                    <img src="image/unifiedrec.png" alt="Patient Dashboard">
+                </div>
+                <div class="how-to-text">
+                    <h3><i class="fas fa-user-md"></i>Unified Patient Records</h3>
+                    <p>Access a complete, holistic view of patient information. From medical history and diagnoses to lab results and prescriptions, all data is centralized in one secure and easy-to-navigate dashboard for efficient decision-making.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to-section alternate">
+            <div class="how-to-container">
+                <div class="how-to-image">
+                    <img src="image/intelsched.png" alt="Appointment Scheduling">
+                </div>
+                <div class="how-to-text">
+                    <h3><i class="fas fa-calendar-alt"></i>Intelligent Scheduling</h3>
+                    <p>Our smart calendar system simplifies appointment management. Patients can book slots online based on real-time availability, and automated reminders are sent to reduce no-shows, optimizing the workflow for your clinic.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to-section">
+            <div class="how-to-container">
+                <div class="how-to-image">
+                    <img src="image/secdata.png" alt="Data Security">
+                </div>
+                <div class="how-to-text">
+                    <h3><i class="fas fa-shield-alt"></i>Bank-Grade Security</h3>
+                    <p>We prioritize data privacy with end-to-end encryption and compliance with industry standards like HIPAA. Rest assured that all sensitive patient information is protected against unauthorized access.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to-section alternate">
+            <div class="how-to-container">
+                <div class="how-to-image">
+                    <img src="image/telemed.png" alt="Telemedicine">
+                </div>
+                <div class="how-to-text">
+                    <h3><i class="fas fa-video"></i>Telemedicine Integration</h3>
+                    <p>Provide care from anywhere with our fully integrated telehealth solution. Conduct secure video consultations directly within the EHR platform, maintaining a continuous and documented patient care experience without third-party apps.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to-section">
+            <div class="how-to-container">
+                <div class="how-to-image">
+                    <img src="image/epres.png" alt="E-Prescribing">
+                </div>
+                <div class="how-to-text">
+                    <h3><i class="fas fa-pills"></i>Secure E-Prescribing</h3>
+                    <p>Send prescriptions directly to pharmacies electronically. Our system helps reduce errors, improves patient safety, and streamlines the medication management process for both doctors and patients.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section class="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="timeline">
+            <div class="timeline-step">
+                <div class="timeline-icon"><i class="fas fa-user-plus"></i></div>
+                <h4>1. Register</h4>
+                <p>Create a secure account in minutes as a doctor or a patient.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-icon"><i class="fas fa-id-card"></i></div>
+                <h4>2. Build Profile</h4>
+                <p>Patients fill in their medical history; doctors set up their practice details.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-icon"><i class="fas fa-tasks"></i></div>
+                <h4>3. Manage</h4>
+                <p>Book appointments, access records, and communicate seamlessly.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-icon"><i class="fas fa-chart-line"></i></div>
+                <h4>4. Analyze</h4>
+                <p>Utilize powerful reporting tools to track progress and health trends.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="reviews" class="reviews">
+        <h2 class="section-title">What Our Customers Say?</h2>
+        <div class="reviews-container">
+            <div class="review-card">
+                <p>"This EHR system has transformed my practice. I can access patient histories instantly, which has made my consultations much more efficient."</p>
+                <div class="reviewer-info">
+                    <img src="image\doc1.jpg" alt="Dr. Anjali Sharma">
+                    <span><strong>Dr. Anjali Sharma</strong><br>Cardiologist</span>
+                </div>
+            </div>
+            <div class="review-card">
+                <p>"As a patient, I love having all my medical records in one place. Booking appointments and viewing my lab results has never been easier."</p>
+                <div class="reviewer-info">
+                    <img src="image/pat1.jpeg" alt="Rohan Verma">
+                    <span><strong>Rohan Verma</strong><br>Patient</span>
+                </div>
+            </div>
+            <div class="review-card">
+                <p>"The user interface is incredibly intuitive. The reporting features are fantastic for tracking patient progress over time. Highly recommended!"</p>
+                <div class="reviewer-info">
+                    <img src="image/doc2.jpg" alt="Dr. Ken Patel">
+                    <span><strong>Dr. Ken Patel</strong><br>General Physician</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2 class="section-title">Get In Touch</h2>
+        <form id="contactForm">
+            <label for="cname" class="sr-only">Name:</label>
+            <input type="text" id="cname" placeholder="Your Name" required>
+            <label for="cemail" class="sr-only">Email:</label>
+            <input type="email" id="cemail" placeholder="Your Email" required>
+            <label for="cmessage" class="sr-only">Message:</label>
+            <textarea id="cmessage" rows="4" placeholder="Your Message" required></textarea>
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <h4>EHR System</h4>
+                <p>Simplifying healthcare records for professionals and patients. Our mission is to provide a secure, reliable, and user-friendly platform.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <a href="https://www.linkedin.com/in/alokupadhyay942/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://www.instagram.com/alok_upadhyay004/?hl=en"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            
+            <p> Developed by Alok Upadhyay<br> &copy; 2025 EHR System. All rights reserved.</p>
+        </div>
+    </footer>
+    <div class="aura-widget-container" id="chatbot-trigger">
+
+        <div class="aura-bubble" id="aura-bubble">
+            <span class="aura-close" id="close-bubble">×</span>
+            Hey! I am Aura... Your Personal Health Assistant.
+        </div>
+
+        <div class="aura-avatar">
+            <img src="image/aura.jpg?w=740" alt="Aura Bot">
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const trigger = document.getElementById("chatbot-trigger");
+    const closeBubble = document.getElementById("close-bubble");
+    const bubble = document.getElementById("aura-bubble");
+
+    // 1. Logic to Open the Bot Window (Main Click)
+    trigger.addEventListener("click", () => {
+        const botWindow = window.open("bot.html", "ResQNowBot", "width=420,height=650,scrollbars=no");
+        if (botWindow) {
+            botWindow.focus();
+        } else {
+            alert("Please allow pop-ups for this website to use the chatbot.");
+        }
+    });
+
+    // 2. Logic to Close ONLY the Bubble (Prevent opening bot window)
+    closeBubble.addEventListener("click", (e) => {
+        e.stopPropagation(); // This stops the click from reaching the main trigger
+        bubble.style.display = "none"; // Hides the text bubble
+    });
+});
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Modal Logic ---
+            const loginModal = document.getElementById('loginModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const closeButton = document.querySelector('.close-button');
+
+            // Function to open the modal
+            const openModal = () => {
+                if (loginModal) loginModal.style.display = 'block';
+            };
+
+            // Function to close the modal
+            const closeModal = () => {
+                if (loginModal) loginModal.style.display = 'none';
+            };
+
+            // Event Listeners for the modal
+            if (loginBtn) {
+                loginBtn.addEventListener('click', openModal);
+            }
+            if (closeButton) {
+                closeButton.addEventListener('click', closeModal);
+            }
+
+            // Close modal if user clicks outside of the modal content
+            window.addEventListener('click', (event) => {
+                if (event.target === loginModal) {
+                    closeModal();
+                }
+            });
+
+            // --- Contact Form Logic ---
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault(); 
+                    const name = document.getElementById('cname').value;
+                    alert(`Thank you for your message, ${name}! We will get back to you soon.`);
+                    e.target.reset(); 
+                });
+            }
+        });
+         document.getElementById("chatbot-icon").addEventListener("click", () => {
+            const botWindow = window.open("bot.html", "ResQNowBot", "width=420,height=650,scrollbars=no");
+            if (botWindow) {
+                botWindow.focus();
+            } else {
+                alert("Please allow pop-ups for this website to use the chatbot.");
+            }
+        });
+    </script>
+</body>
+</html>

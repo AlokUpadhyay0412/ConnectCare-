@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EHR - Patient Signup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+    .signup-wrapper { display: flex; min-height: 100vh; }
+    .left-panel { flex: 1; background: url('image/patsign.png') center/cover no-repeat; display: flex; flex-direction: column; justify-content: flex-end; padding: 48px; color: white; position: relative; }
+    .left-panel::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(19, 78, 127, 0.8), rgba(12, 49, 83, 0.2)); z-index: 1; }
+    .left-panel h1, .left-panel p { position: relative; z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .right-panel { flex: 1; display: grid; place-items: center; padding: 24px; }
+    .signup-container { width: 100%; max-width: 480px; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07); }
+    h2 { font-size: 2rem; margin-top: 0; margin-bottom: 24px; text-align: center; }
+    label { display: block; margin-top: 16px; margin-bottom: 6px; font-weight: 600; }
+    input { width: 100%; padding: 12px; border: 1px solid #d7dbe3; border-radius: 8px; box-sizing: border-box; }
+    button { width: 100%; margin-top: 24px; padding: 14px; border: none; border-radius: 8px; background: #2196F3; color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
+    .note { font-size: 0.9rem; margin-top: 20px; text-align: center; }
+    .note a { color: #2196F3; text-decoration: none; }
+    @media (max-width: 900px) { .left-panel { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="signup-wrapper">
+    <div class="left-panel">
+      <h1>Your Health Journey Starts Here</h1>
+      <p>Create a secure account to manage your health information all in one place.</p>
+    </div>
+    <div class="right-panel">
+      <div class="signup-container">
+        <h2>Create Patient Account</h2>
+        <form id="patientSignupForm">
+          <label for="patientName">Full Name</label>
+          <input type="text" id="patientName" name="name" required>
+          <label for="patientEmail">Email Address</label>
+          <input type="email" id="patientEmail" name="email" required>
+          <label for="contactNumber">Contact Number</label>
+          <input type="tel" id="contactNumber" name="contact">
+          <label for="patientPassword">Password</label>
+          <input type="password" id="patientPassword" name="password" placeholder="At least 8 characters" required>
+          <button type="submit">Sign Up</button>
+        </form>
+        <p class="note">Already have an account? <a href="patientlogin.html">Login here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('patientSignupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('patientName').value.trim(),
+        email: document.getElementById('patientEmail').value.trim(),
+        password: document.getElementById('patientPassword').value,
+        contact: document.getElementById('contactNumber').value.trim()
+      };
+      try {
+        const res = await fetch('/api/patient/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.message);
+        if (res.ok) {
+          window.location.href = 'patientlogin.html';
+        }
+      } catch (err) {
+        alert('An error occurred. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>

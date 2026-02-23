@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EHR - Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background-color: #e0e7ec; }
+    .login-wrapper { display: flex; min-height: 100vh; justify-content: center; align-items: center; padding: 20px; }
+    
+    .login-container { 
+        width: 100%; max-width: 400px; background: #fff; padding: 40px; 
+        border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+        border-top: 6px solid #607D8B; 
+    }
+    
+    h2 { font-size: 1.8rem; margin: 0 0 10px; text-align: center; color: #37474F; }
+    p.subtitle { text-align: center; color: #78909C; margin-bottom: 30px; font-size: 0.95rem; }
+    
+    label { display: block; margin-top: 16px; margin-bottom: 6px; font-weight: 600; color: #455A64; }
+    input { width: 100%; padding: 12px; border: 1px solid #CFD8DC; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+    input:focus { border-color: #607D8B; outline: none; }
+    
+    button { 
+        width: 100%; margin-top: 24px; padding: 14px; border: none; 
+        border-radius: 8px; background: #607D8B; color: #fff; 
+        font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s;
+    }
+    button:hover { background: #455A64; }
+    
+    .back-link { text-align: center; margin-top: 25px; display: block; color: #78909C; text-decoration: none; font-size: 0.9rem; }
+    .back-link:hover { color: #455A64; }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+      <div class="login-container">
+        <h2>Admin Portal</h2>
+        <p class="subtitle">Restricted Access</p>
+        <form id="adminLoginForm">
+          <label for="adminEmail">Email Address</label>
+          <input type="email" id="adminEmail" name="email" placeholder="admin@ehr.com" required>
+
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" name="password" placeholder="Enter secure password" required>
+
+          <button type="submit">Secure Login</button>
+        </form>
+        <a href="adminDashboard.html" class="back-link">← Back to Main Menu</a>
+      </div>
+  </div>
+
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        email: document.getElementById('adminEmail').value.trim(),
+        password: document.getElementById('adminPassword').value
+      };
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('role', 'admin');
+          alert('Admin access granted.');
+          // Redirect to admin dashboard (you will need to create this file separately)
+          // window.location.href = 'adminDashboard.html'; 
+          alert('Redirecting to Admin Dashboard... (File needs to be created)');
+        } else {
+          alert(`Login Failed: ${data.message}`);
+        }
+      } catch (err) {
+        console.error("Login Error:", err);
+        alert('Unable to connect to server.');
+      }
+    });
+  </script>
+</body>
+</html>

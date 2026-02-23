@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EHR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Base Styles --- */
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; color: #333; }
+
+        /* --- Header --- */
+        header { background: #4CAF50; padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: white; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+
+        .header-actions { display: flex; gap: 15px; }
+
+        .btn-header { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 0.9rem; }
+        .btn-dir { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
+        .btn-dir:hover { background: rgba(255,255,255,0.3); }
+        .btn-logout { background: white; color: #4CAF50; }
+        .btn-logout:hover { background: #f1f1f1; }
+
+        /* --- Hero --- */
+        .admin-hero { background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white; text-align: center; padding: 50px 20px; margin-bottom: 40px; }
+        .admin-hero h1 { margin: 0 0 10px 0; font-size: 2.2rem; }
+
+        /* --- Stats Grid --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 60px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: -40px; margin-bottom: 40px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; border-bottom: 4px solid #4CAF50; }
+        .stat-card i { font-size: 2.5rem; color: #4CAF50; margin-bottom: 10px; }
+        .stat-card h3 { margin: 5px 0; font-size: 2rem; color: #333; }
+        .stat-card p { color: #666; margin: 0; font-weight: 600; font-size: 0.9rem; }
+
+        /* --- Doctor List --- */
+        .section-title { font-size: 1.5rem; color: #2E7D32; margin-bottom: 20px; border-left: 5px solid #4CAF50; padding-left: 15px; }
+        .doctor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+
+        .doctor-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; transition: transform 0.2s; border: 1px solid #eee; }
+        .doctor-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .card-header { background: #E8F5E9; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .card-header img { width: 45px; height: 45px; border-radius: 50%; background: white; padding: 2px; }
+        .doc-info h3 { margin: 0; font-size: 1.1rem; color: #2E7D32; }
+        .doc-info span { font-size: 0.85rem; color: #555; background: white; padding: 2px 8px; border-radius: 10px; border: 1px solid #ddd; }
+
+        .card-body { padding: 20px; }
+        .card-body p { margin: 8px 0; color: #555; font-size: 0.9rem; }
+
+        .btn-verify { width: 100%; background: #4CAF50; color: white; border: none; padding: 10px; font-weight: 600; cursor: pointer; border-radius: 6px; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-verify:hover { background: #388E3C; }
+
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 8px; color: #888; }
+
+        /* --- MODAL (Directory) --- */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 800px; border-radius: 12px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-header { background: #4CAF50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .modal-close { font-size: 24px; cursor: pointer; color: white; }
+
+        .modal-tabs { display: flex; background: #f1f1f1; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; font-weight: 600; cursor: pointer; color: #666; border-bottom: 3px solid transparent; }
+        .tab-btn.active { background: white; color: #4CAF50; border-bottom-color: #4CAF50; }
+
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+        .user-table { width: 100%; border-collapse: collapse; }
+        .user-table th, .user-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .user-table th { background: #f9f9f9; color: #666; font-size: 0.9rem; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        .status-verified { background: #E8F5E9; color: #2E7D32; }
+        .status-pending { background: #FFF3E0; color: #EF6C00; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fas fa-user-shield"></i> &nbsp; EHR Admin
+        </div>
+        <div class="header-actions">
+            <button class="btn-header btn-dir" id="openDirectoryBtn">
+                <i class="fas fa-address-book"></i> System Directory
+            </button>
+            <button class="btn-header btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <section class="admin-hero">
+        <h1>Admin Control Panel</h1>
+        <p>System Health • User Management • Verifications</p>
+    </section>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-user-md"></i>
+                <h3 id="statDoctors">--</h3>
+                <p>Registered Doctors</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-user-injured"></i>
+                <h3 id="statPatients">--</h3>
+                <p>Active Patients</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-hourglass-half"></i>
+                <h3 id="statPending" style="color: #FF5722;">--</h3>
+                <p>Pending Approvals</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-server"></i>
+                <h3 id="statStatus">Online</h3>
+                <p>System Status</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">⚠️ Pending Verifications</h2>
+        <div id="doctorList" class="doctor-grid">
+            <div class="empty-state">Loading...</div>
+        </div>
+    </div>
+
+    <div id="directoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>System Directory</h3>
+                <span class="modal-close" id="closeDirectoryBtn">&times;</span>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tabDocsBtn">Doctors List</button>
+                <button class="tab-btn" id="tabPatsBtn">Patients List</button>
+            </div>
+            <div class="modal-body">
+                <div id="tab-doctors-content">
+                    <table class="user-table">
+                        <thead><tr><th>Name</th><th>Specialization</th><th>Joined</th><th>Status</th></tr></thead>
+                        <tbody id="listDoctors"></tbody>
+                    </table>
+                </div>
+                <div id="tab-patients-content" style="display:none;">
+                    <table class="user-table">
+                        <thead><tr><th>Name</th><th>Joined</th><th>Role</th></tr></thead>
+                        <tbody id="listPatients"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('authToken');
+const role = localStorage.getItem('role');
+
+// --- 1. VERIFY DOCTOR FUNCTION ---
+// Keep this on the window object just in case, though we'll call it directly now
+window.verifyDoctor = async function(doctorId, doctorName) {
+    if (!confirm(`Are you sure you want to verify Dr. ${doctorName}?`)) return;
+
+    try {
+        const res = await fetch('/api/admin/verify-doctor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ doctorId: parseInt(doctorId) })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Success: Doctor is now verified.");
+            loadDashboardData(); // Refresh the list
+        } else {
+            alert("Error: " + (data.message || "Could not verify doctor."));
+        }
+    } catch (e) {
+        console.error("Verification Error:", e);
+        alert("Server communication error.");
+    }
+};
+
+// --- 2. INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (!token || role !== 'admin') {
+        window.location.href = 'adminlogin.html';
+        return;
+    }
+
+    loadDashboardData();
+
+    // Directory Modal Logic
+    const modal = document.getElementById('directoryModal');
+    document.getElementById('openDirectoryBtn').addEventListener('click', () => {
+        modal.style.display = 'flex';
+        loadDirectoryData();
+    });
+
+    document.getElementById('closeDirectoryBtn').addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Tab Switching
+    const tabDocsBtn = document.getElementById('tabDocsBtn');
+    const tabPatsBtn = document.getElementById('tabPatsBtn');
+    const contentDocs = document.getElementById('tab-doctors-content');
+    const contentPats = document.getElementById('tab-patients-content');
+
+    tabDocsBtn.addEventListener('click', () => {
+        tabDocsBtn.classList.add('active');
+        tabPatsBtn.classList.remove('active');
+        contentDocs.style.display = 'block';
+        contentPats.style.display = 'none';
+    });
+
+    tabPatsBtn.addEventListener('click', () => {
+        tabPatsBtn.classList.add('active');
+        tabDocsBtn.classList.remove('active');
+        contentDocs.style.display = 'none';
+        contentPats.style.display = 'block';
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    });
+});
+
+// --- 3. DASHBOARD DATA LOADER ---
+async function loadDashboardData() {
+    try {
+        // Fetch Stats
+        const statsRes = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+        const stats = await statsRes.json();
+        if(stats.success) {
+            document.getElementById('statDoctors').textContent = stats.stats.doctors;
+            document.getElementById('statPatients').textContent = stats.stats.patients;
+            document.getElementById('statPending').textContent = stats.stats.pending;
+        }
+
+        // Fetch Pending Doctors
+        const pendingRes = await fetch('/api/admin/unverified-doctors', { headers: { 'Authorization': `Bearer ${token}` } });
+        const pending = await pendingRes.json();
+
+        const grid = document.getElementById('doctorList');
+        grid.innerHTML = '';
+
+        if(!pending.doctors || pending.doctors.length === 0) {
+            grid.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle" style="font-size:2rem; color:#4CAF50"></i><p>No pending verifications.</p></div>`;
+            return;
+        }
+
+        pending.doctors.forEach(doc => {
+            const card = document.createElement('div');
+            card.className = 'doctor-card';
+
+            // Note: We removed the onclick attribute from the button HTML string
+            card.innerHTML = `
+                <div class="card-header">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(doc.name)}" alt="Doc">
+                    <div class="doc-info">
+                        <h3>${doc.name}</h3>
+                        <span>${doc.specialization}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p><strong>License:</strong> ${doc.license_number || '--'}</p>
+                    <p><strong>Date:</strong> ${new Date(doc.created_at).toLocaleDateString()}</p>
+                    <button class="btn-verify" id="btn-verify-${doc.id}">
+                        <i class="fas fa-check-circle"></i> Approve & Verify
+                    </button>
+                </div>`;
+
+            grid.appendChild(card);
+
+            // ATTACH EVENT LISTENER MANUALLY (This bypasses security blocks)
+            const verifyBtn = document.getElementById(`btn-verify-${doc.id}`);
+            verifyBtn.addEventListener('click', () => {
+                window.verifyDoctor(doc.id, doc.name);
+            });
+        });
+
+    } catch(e) {
+        console.error("Dashboard Load Error:", e);
+        document.getElementById('doctorList').innerHTML = `<p style="color:red; text-align:center;">Failed to load data. Please check connection.</p>`;
+    }
+}
+
+// --- 4. DIRECTORY DATA LOADER ---
+async function loadDirectoryData() {
+    try {
+        const res = await fetch('/api/admin/all-users', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+
+        if(data.success) {
+            const docTbody = document.getElementById('listDoctors');
+            docTbody.innerHTML = '';
+            data.doctors.forEach(d => {
+                const statusClass = d.is_verified ? 'status-verified' : 'status-pending';
+                const statusText = d.is_verified ? 'Verified' : 'Pending';
+                docTbody.innerHTML += `<tr><td>${d.name}</td><td>${d.specialization}</td><td>${d.joined}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td></tr>`;
+            });
+
+            const patTbody = document.getElementById('listPatients');
+            patTbody.innerHTML = '';
+            data.patients.forEach(p => {
+                patTbody.innerHTML += `<tr><td>${p.name}</td><td>${p.joined}</td><td>Patient</td></tr>`;
+            });
+        }
+    } catch(e) { console.error("Directory Load Error:", e); }
+}
+    </script>
+</body>
+</html>

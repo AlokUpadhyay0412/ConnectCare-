@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Prescribing - EHR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* --- THEME VARIABLES (Matched to Dashboard) --- */
+    :root {
+      --primary: #4CAF50;
+      --primary-dark: #2E7D32;
+      --bg-light: #f4f7f6;
+      --text-dark: #333;
+      --text-light: #666;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --border-color: #e0e0e0;
+    }
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: var(--white);
+      padding: 15px 5%;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .nav-links a.active {
+      color: var(--primary);
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn-logout {
+      padding: 8px 20px;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-logout:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* --- MAIN LAYOUT --- */
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px 60px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-header h2 {
+      font-size: 2rem;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* --- CONTROLS --- */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    #searchInput {
+      flex-grow: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #searchInput:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-green {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-green:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* --- TABLE --- */
+    .table-container {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 18px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover {
+      background-color: #fcfcfc;
+    }
+
+    .status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-sent {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-pending {
+      background-color: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .btn-view {
+      background-color: #2196F3;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-view:hover {
+      background-color: #1976D2;
+    }
+
+    /* --- MODALS --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--white);
+      width: 90%;
+      max-width: 550px;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: slideUp 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      background: var(--primary);
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .modal-close {
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
+      opacity: 0.8;
+    }
+
+    .modal-close:hover {
+      opacity: 1;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    /* Forms */
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .modal-footer {
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      background: #f1f1f1;
+      color: #333;
+    }
+
+    /* View Details Styling */
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 12px 0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #888;
+      font-weight: 600;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .med-highlight {
+      font-size: 1.2rem;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 0;
+      border-bottom: 2px solid var(--primary);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo"><i class="fas fa-user-md fa-lg"></i> &nbsp; EHR Doctor</div>
+    <div class="nav-links">
+      <a href="doctorDashboard.html">Dashboard</a>
+      <a href="E-Prescribing.html" class="active">E-Prescribing</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:15px;">
+      <span>Dr. <strong id="doctorName">...</strong></span>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <h2>E-Prescribing System</h2>
+    </div>
+
+    <div class="controls">
+      <div style="flex-grow:1; position: relative;">
+        <i class="fas fa-search" style="position: absolute; left: 15px; top: 15px; color: #aaa;"></i>
+        <input type="text" id="searchInput" placeholder="Search by patient or medication..."
+          style="padding-left: 40px;">
+      </div>
+      <button class="btn btn-green" id="openCreateModal">
+        <i class="fas fa-plus-circle"></i> New Prescription
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Medication</th>
+            <th>Date Issued</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="prescriptionsTableBody">
+          <tr>
+            <td colspan="5" style="text-align:center; padding:30px;">Loading records...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="createModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Issue New Prescription</h3>
+        <span class="modal-close" data-target="createModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="prescriptionForm">
+          <div class="full-width">
+            <label>Select Patient</label>
+            <select id="patientSelect" name="patient_id" required>
+              <option value="">Loading patients...</option>
+            </select>
+          </div>
+
+          <div class="full-width">
+            <label>Medication Name</label>
+            <input type="text" name="medication" placeholder="e.g. Amoxicillin" required>
+          </div>
+
+          <div>
+            <label>Dosage</label>
+            <input type="text" name="dosage" placeholder="e.g. 500mg">
+          </div>
+          <div>
+            <label>Quantity</label>
+            <input type="number" name="quantity" placeholder="e.g. 30">
+          </div>
+
+          <div class="full-width">
+            <label>Pharmacy (Optional)</label>
+            <input type="text" name="pharmacy" placeholder="e.g. CVS Pharmacy #123">
+          </div>
+
+          <input type="hidden" name="date_issued" id="date_issued_input">
+
+          <div class="full-width modal-footer">
+            <button type="button" class="btn btn-cancel" id="cancelCreate">Cancel</button>
+            <button type="submit" class="btn btn-green">Send Prescription</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Prescription Details</h3>
+        <span class="modal-close" data-target="viewModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="med-highlight" id="viewMedication">--</div>
+
+        <div class="detail-row">
+          <span class="detail-label">Patient Name</span>
+          <span class="detail-value" id="viewPatient">--</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date Issued</span>
+          <span class="detail-value" id="viewDate">--</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Dosage</span>
+          <span class="detail-value" id="viewDosage">--</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Quantity</span>
+          <span class="detail-value" id="viewQuantity">--</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Pharmacy</span>
+          <span class="detail-value" id="viewPharmacy">--</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value" style="color:var(--primary); font-weight:bold;" id="viewStatus">--</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-green" id="closeViewBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. GLOBAL SETUP ---
+    const authToken = localStorage.getItem('authToken');
+    const doctorName = localStorage.getItem('doctorName');
+    let ALL_PRESCRIPTIONS = [];
+
+    // --- 2. INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!authToken) {
+        window.location.href = 'doctorlogin.html';
+        return;
+      }
+      document.getElementById('doctorName').textContent = doctorName || 'Doctor';
+
+      loadPrescriptions();
+
+      // Event Delegation for "Details" Buttons
+      document.getElementById('prescriptionsTableBody').addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-view');
+        if (btn) {
+          const id = btn.getAttribute('data-id');
+          openViewModal(id);
+        }
+      });
+
+      // Modal Controls
+      document.getElementById('openCreateModal').addEventListener('click', loadPatientsAndOpen);
+      document.getElementById('cancelCreate').addEventListener('click', () => toggleModal('createModal', false));
+      document.getElementById('closeViewBtn').addEventListener('click', () => toggleModal('viewModal', false));
+
+      document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', (e) => toggleModal(e.target.dataset.target, false));
+      });
+
+      window.onclick = function (e) {
+        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+      }
+
+      // Search
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = ALL_PRESCRIPTIONS.filter(rx =>
+          (rx.patient_name && rx.patient_name.toLowerCase().includes(term)) ||
+          (rx.medication && rx.medication.toLowerCase().includes(term))
+        );
+        renderTable(filtered);
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      });
+
+      // Submit Form
+      document.getElementById('prescriptionForm').addEventListener('submit', submitPrescription);
+    });
+
+    // --- 3. HELPER FUNCTIONS ---
+    function toggleModal(id, show) {
+      document.getElementById(id).style.display = show ? 'flex' : 'none';
+    }
+
+    // --- 4. DATA LOADING ---
+    async function loadPrescriptions() {
+      try {
+        const res = await fetch(`/api/doctor/recent-prescriptions`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          ALL_PRESCRIPTIONS = data.prescriptions;
+          renderTable(ALL_PRESCRIPTIONS);
+        }
+      } catch (err) { console.error("Error loading data:", err); }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('prescriptionsTableBody');
+      tbody.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px;">No prescriptions found.</td></tr>`;
+        return;
+      }
+
+      data.forEach(rx => {
+        const dateStr = rx.date_issued ? new Date(rx.date_issued).toLocaleDateString() : 'N/A';
+        const statusClass = (rx.status || 'Sent') === 'Sent' ? 'status-sent' : 'status-pending';
+        const pName = rx.patient_name || 'Unknown';
+
+        tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${pName}</strong></td>
+                        <td>${rx.medication}</td>
+                        <td>${dateStr}</td>
+                        <td><span class="status ${statusClass}">${rx.status || 'Sent'}</span></td>
+                        <td>
+                            <button class="btn-view" data-id="${rx.id}">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                        </td>
+                    </tr>
+                `;
+      });
+    }
+
+    // --- 5. VIEW DETAILS LOGIC ---
+    function openViewModal(id) {
+      // Because IDs from HTML attr are strings, use loose equality or parse
+      const rx = ALL_PRESCRIPTIONS.find(r => r.id == id);
+
+      if (!rx) { alert("Details not found locally."); return; }
+
+      document.getElementById('viewMedication').textContent = rx.medication;
+      document.getElementById('viewPatient').textContent = rx.patient_name || 'Unknown';
+      document.getElementById('viewDate').textContent = rx.date_issued ? new Date(rx.date_issued).toLocaleDateString() : '--';
+      document.getElementById('viewDosage').textContent = rx.dosage || '--';
+      document.getElementById('viewQuantity').textContent = rx.quantity || '--';
+      document.getElementById('viewPharmacy').textContent = rx.pharmacy || 'Not Specified';
+      document.getElementById('viewStatus').textContent = rx.status || 'Sent';
+
+      toggleModal('viewModal', true);
+    }
+
+    // --- 6. CREATE PRESCRIPTION LOGIC ---
+    async function loadPatientsAndOpen() {
+      try {
+        const res = await fetch(`/api/doctor/my-patients`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        const data = await res.json();
+        if (data.success) {
+          const select = document.getElementById('patientSelect');
+          select.innerHTML = '<option value="">Select Patient...</option>';
+          data.patients.forEach(p => {
+            select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+          });
+          document.getElementById('date_issued_input').value = new Date().toISOString().split('T')[0];
+          toggleModal('createModal', true);
+        }
+      } catch (e) { alert("Error loading patients."); }
+    }
+
+    async function submitPrescription(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/doctor/prescriptions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify({ prescriptionData: payload })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("Sent Successfully!");
+          toggleModal('createModal', false);
+          e.target.reset();
+          loadPrescriptions();
+        } else {
+          alert("Error: " + data.message);
+        }
+      } catch (err) { alert("Server error."); }
+    }
+  </script>
+</body>
+
+</html>
